@@ -1,0 +1,4 @@
+.aws-sam*
+samconfig.toml
+google_key.json
+*.drawio

@@ -1,0 +1,117 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+Description: valorant-match schedule - Function manages Gcal events
+
+Parameters:
+  GoogleServiceAccountId:
+    Type: String
+  CalendarIdApac:
+    Type: String
+  CalendarIdBrLatam:
+    Type: String
+  CalendarIdEastAsia:
+    Type: String
+  CalendarIdEmea:
+    Type: String
+  CalendarIdNa:
+    Type: String
+
+
+Resources:
+  GoogleAuthLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: google-auth
+      ContentUri: layer/google-auth/
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9
+
+  GoogleApiPythonClientLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: google-api-python-client
+      ContentUri: layer/google-api-python-client/
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9
+
+
+  AddGcalEventFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: function/
+      Description: "add valorant match to google calendar as a event"
+      Handler: index.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 30
+      Policies:
+        - AWSLambdaDynamoDBExecutionRole
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          OUTBOX_TABLE: !Ref OutboxTable
+          GOOGLE_SERVICE_ACCOUNT_ID: !Ref GoogleServiceAccountId
+          CALENDAR_ID_APAC: !Ref CalendarIdApac
+          CALENDAR_ID_BR_LATAM: !Ref CalendarIdBrLatam
+          CALENDAR_ID_EAST_ASIA: !Ref CalendarIdEastAsia
+          CALENDAR_ID_EMEA: !Ref CalendarIdEmea
+          CALENDAR_ID_NA: !Ref CalendarIdNa
+      Layers:
+        - !Ref GoogleAuthLayer
+        - !Ref GoogleApiPythonClientLayer
+      Events:
+        Stream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt MatchListTable.StreamArn
+            BatchSize: 1
+            BisectBatchOnFunctionError: true
+            Enabled: true
+            StartingPosition: TRIM_HORIZON
+
+  MatchListTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - AttributeName: match_id
+          AttributeType: S
+      BillingMode: PROVISIONED
+      KeySchema: 
+        - AttributeName: match_id
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  OutboxTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - AttributeName: match_id
+          AttributeType: S
+      BillingMode: PROVISIONED
+      KeySchema: 
+        - AttributeName: match_id
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+Outputs:
+  MatchListTableName:
+    Description: DynamoDB Table for match list
+    Value: !Ref MatchListTable
+  OutboxTableName:
+    Description: DynamoDB Table for outbox(store gcal event status)
+    Value: !Ref OutboxTable
