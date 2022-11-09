@@ -114,7 +114,7 @@ def assemble_gcal_event_json(action, item):
         }
     }
 
-    if gcal_event == "ADD":
+    if action == "ADD":
         return dict(**event_id, **detail)
     else:
         return detail
