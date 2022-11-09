@@ -85,7 +85,7 @@ def if_gcal_event_registered(match_id):
     record = table.get_item(Key={'match_id': match_id})
     if 'Item' in record:
         logger.info(
-            'match id: {} found to already be registered. id'.format(match_id))
+            'match id: {} found to already be registered'.format(match_id))
         return True, record['Item']['event_id']
     else:
         logger.info(
