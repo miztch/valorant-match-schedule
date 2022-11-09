@@ -28,18 +28,11 @@ If you want to do it yourself, you should be ready with:
 
 ## Provisioning
 
-You can use [AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) to provision this function.
+You can use [AWS SAM](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) to provision this application.
+- Templates are nested, so you have to execute `sam deploy` only once
 
-- first, you have to deploy `add-gcal-event`
-  ```bash
-  cd valorant-match-schedule/add-gcal-event/
-  sam build
-  sam deploy --guided
-  ```
-
-- then, you can deploy `get-match-list`
-  ```bash
-  cd ../get-match-list/
-  sam build
-  sam deploy --guided
-  ```
+```bash
+cd valorant-match-schedule/
+sam build
+sam deploy --guided --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND
+```

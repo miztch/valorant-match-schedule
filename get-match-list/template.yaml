@@ -7,7 +7,7 @@ Parameters:
     Description: schedule expression for the eventbridge event
     Type: String
     Default: rate(6 hours)
-  MatchListTable:
+  MatchListTableName:
     Description: DynamoDB table name for match list
     Type: String
 
@@ -37,7 +37,7 @@ Resources:
         - AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          MATCHLIST_TABLE: !Ref MatchListTable
+          MATCHLIST_TABLE: !Ref MatchListTableName
       Layers:
         - !Ref RequestsLayer
       Events:

@@ -15,7 +15,10 @@ Parameters:
     Type: String
   CalendarIdNa:
     Type: String
-
+  MatchListTableArn:
+    Type: String
+  OutboxTableName:
+    Type: String
 
 Resources:
   GoogleAuthLayer:
@@ -55,7 +58,7 @@ Resources:
         - AmazonDynamoDBFullAccess
       Environment:
         Variables:
-          OUTBOX_TABLE: !Ref OutboxTable
+          OUTBOX_TABLE: !Ref OutboxTableName
           GOOGLE_SERVICE_ACCOUNT_ID: !Ref GoogleServiceAccountId
           CALENDAR_ID_APAC: !Ref CalendarIdApac
           CALENDAR_ID_BR_LATAM: !Ref CalendarIdBrLatam
@@ -69,49 +72,8 @@ Resources:
         Stream:
           Type: DynamoDB
           Properties:
-            Stream: !GetAtt MatchListTable.StreamArn
+            Stream: !Ref MatchListTableArn
             BatchSize: 1
             BisectBatchOnFunctionError: true
             Enabled: true
             StartingPosition: TRIM_HORIZON
-
-  MatchListTable:
-    Type: AWS::DynamoDB::Table
-    Properties: 
-      AttributeDefinitions: 
-        - AttributeName: match_id
-          AttributeType: S
-      BillingMode: PROVISIONED
-      KeySchema: 
-        - AttributeName: match_id
-          KeyType: HASH
-      ProvisionedThroughput: 
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
-      StreamSpecification:
-        StreamViewType: NEW_AND_OLD_IMAGES
-      TimeToLiveSpecification:
-        AttributeName: ttl
-        Enabled: true
-
-  OutboxTable:
-    Type: AWS::DynamoDB::Table
-    Properties: 
-      AttributeDefinitions: 
-        - AttributeName: match_id
-          AttributeType: S
-      BillingMode: PROVISIONED
-      KeySchema: 
-        - AttributeName: match_id
-          KeyType: HASH
-      ProvisionedThroughput: 
-        ReadCapacityUnits: 1
-        WriteCapacityUnits: 1
-
-Outputs:
-  MatchListTableName:
-    Description: DynamoDB Table for match list
-    Value: !Ref MatchListTable
-  OutboxTableName:
-    Description: DynamoDB Table for outbox(store gcal event status)
-    Value: !Ref OutboxTable

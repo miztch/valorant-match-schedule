@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: "AWS::Serverless-2016-10-31"
+Description: valorant-match-schedule
+
+Parameters:
+  GoogleServiceAccountId:
+    Type: String
+  CalendarIdApac:
+    Type: String
+  CalendarIdBrLatam:
+    Type: String
+  CalendarIdEastAsia:
+    Type: String
+  CalendarIdEmea:
+    Type: String
+  CalendarIdNa:
+    Type: String
+  ScheduleExpression:
+    Description: schedule expression for the eventbridge event
+    Type: String
+    Default: rate(6 hours)
+
+Resources:
+  AddGcalEvent:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: add-gcal-event/template.yaml
+      Parameters:
+        GoogleServiceAccountId: !Ref GoogleServiceAccountId
+        CalendarIdApac: !Ref CalendarIdApac
+        CalendarIdBrLatam: !Ref CalendarIdBrLatam
+        CalendarIdEastAsia: !Ref CalendarIdEastAsia
+        CalendarIdEmea: !Ref CalendarIdEmea
+        CalendarIdNa: !Ref CalendarIdNa
+        MatchListTableArn: !GetAtt MatchListTable.StreamArn
+        OutboxTableName: !Ref OutboxTable
+
+  GetMatchList:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: get-match-list/template.yaml
+      Parameters:
+        ScheduleExpression: !Ref ScheduleExpression
+        MatchListTableName: !Ref MatchListTable
+  
+  MatchListTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - AttributeName: match_id
+          AttributeType: S
+      BillingMode: PROVISIONED
+      KeySchema: 
+        - AttributeName: match_id
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      StreamSpecification:
+        StreamViewType: NEW_AND_OLD_IMAGES
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  OutboxTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      AttributeDefinitions: 
+        - AttributeName: match_id
+          AttributeType: S
+      BillingMode: PROVISIONED
+      KeySchema: 
+        - AttributeName: match_id
+          KeyType: HASH
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+Outputs:
+  MatchListTableName:
+    Description: DynamoDB Table for match list
+    Value: !Ref MatchListTable
+  OutboxTableName:
+    Description: DynamoDB Table for outbox(store gcal event status)
+    Value: !Ref OutboxTable
