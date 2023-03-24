@@ -121,20 +121,20 @@ def map_flag_to_region(flag):
     return region
 
 
-def get_matches(date):
+def fetch_daily_matches(date):
     '''
-    get match information for the specified day from api endpoint
+    fetch match information for the specified day from api endpoint
     '''
 
     endpoint = "https://api.thespike.gg/matches"
 
-    logger.info('get matches list from: {}'.format(endpoint))
+    logger.info('fetch matches list from: {}'.format(endpoint))
 
     headers = {"Content-Type": "application/json"}
 
     match_list = []
 
-    logger.info('get matches list for a day: {}'.format(date))
+    logger.info('fetch matches list for a day: {}'.format(date))
     uri = endpoint + '?date=' + date
 
     # due to api endpoint's behabior, requests.get.json() sometimes fails
@@ -205,8 +205,13 @@ def get_matches(date):
 
 
 def lambda_handler(event, context):
-    date = event[]  # TODO check how to get date from event
-    match_list = get_matches(date)
+    records = json.loads(event['Records'])
+    match_list = []
+
+    for record in records:
+        date = record['body']
+        matches = fetch_daily_matches(date)
+        match_list.extend(matches)
 
     insert(table, match_list)
 
