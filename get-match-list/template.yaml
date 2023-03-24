@@ -12,16 +12,6 @@ Parameters:
     Type: String
 
 Resources:
-  RequestsLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: requests
-      ContentUri: layer/requests/
-      CompatibleRuntimes:
-        - python3.9
-    Metadata:
-      BuildMethod: python3.9
-
   GetMatchListFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -34,12 +24,10 @@ Resources:
       MemorySize: 128
       Timeout: 900
       Policies:
-        - AmazonDynamoDBFullAccess
+        - AmazonSQSFullAccess
       Environment:
         Variables:
-          MATCHLIST_TABLE: !Ref MatchListTableName
-      Layers:
-        - !Ref RequestsLayer
+          FETCH_DAILY_MATCHES_QUEUE_URL: !Ref FetchDailyMatchesQueueUrl
       Events:
         CloudWatchEvent:
           Type: Schedule

@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+Description: valorant-match-schedule
+
+Parameters:
+  FetchDailyMatchesQueueArn:
+    Description: Arn of the SQS Queue to subscribe
+    Type: String
+  MatchListTableName:
+    Description: DynamoDB table name for match list
+    Type: String
+
+Resources:
+  RequestsLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: requests
+      ContentUri: layer/requests/
+      CompatibleRuntimes:
+        - python3.9
+    Metadata:
+      BuildMethod: python3.9
+
+  FetchDailyMatchesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: function/
+      Description: "fetch daily valorant matches"
+      Handler: index.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 900
+      Policies:
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          MATCHLIST_TABLE: !Ref MatchListTableName
+      Layers:
+        - !Ref RequestsLayer
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !Ref FetchDailyMatchesQueueArn
+            BatchSize: 10

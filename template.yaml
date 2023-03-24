@@ -41,8 +41,19 @@ Resources:
       Location: get-match-list/template.yaml
       Parameters:
         ScheduleExpression: !Ref ScheduleExpression
+        FetchDailyMatchesQueueUrl: !Ref FetchDailyMatchesQueue
+
+  FetchDailyMatches:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: fetch-daily-matches/template.yaml
+      Parameters:
+        FetchDailyMatchesQueueArn: !GetAtt FetchDailyMatchesQueue.Arn
         MatchListTableName: !Ref MatchListTable
-  
+
+  FetchDailyMatchesQueue:
+    Type: AWS::SQS::Queue
+
   MatchListTable:
     Type: AWS::DynamoDB::Table
     Properties: 
