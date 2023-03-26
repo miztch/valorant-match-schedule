@@ -55,6 +55,7 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       DelaySeconds: 10
+      VisibilityTimeout: 1000
 
   MatchListTable:
     Type: AWS::DynamoDB::Table
