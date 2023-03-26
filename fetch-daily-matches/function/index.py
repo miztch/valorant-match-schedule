@@ -206,6 +206,7 @@ def fetch_daily_matches(date):
 
 def lambda_handler(event, context):
     records = event['Records']
+    print(records)
     match_list = []
 
     for record in records:
