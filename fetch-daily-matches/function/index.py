@@ -205,11 +205,11 @@ def fetch_daily_matches(date):
 
 
 def lambda_handler(event, context):
-    records = json.loads(event['Records'])
+    records = event['Records']
     match_list = []
 
     for record in records:
-        date = record['body']
+        date = record['body']['date']
         matches = fetch_daily_matches(date)
         match_list.extend(matches)
 
