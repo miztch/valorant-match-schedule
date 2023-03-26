@@ -29,7 +29,7 @@ def publish_dates():
         message = json.dumps(payload)
 
         response = sqs.send_message(QueueUrl=queue_url, MessageBody=message)
-        logger.info('message sent. queue:{} message: {}'.format(
+        logger.info('message sent. queue: {} response: {}'.format(
             queue_url, response))
 
 
