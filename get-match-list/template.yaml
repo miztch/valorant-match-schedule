@@ -16,13 +16,13 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: function/
-      Description: "get valorant match list"
+      Description: "invoke fetch-daily-matches function via SQS queue publishing"
       Handler: index.lambda_handler
       Runtime: python3.9
       Architectures:
         - x86_64
       MemorySize: 128
-      Timeout: 900
+      Timeout: 180
       Policies:
         - AmazonSQSFullAccess
       Environment:
