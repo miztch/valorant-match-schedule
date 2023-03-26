@@ -55,7 +55,6 @@ Resources:
     Type: AWS::SQS::Queue
     Properties:
       DelaySeconds: 10
-      FifoQueue: False
 
   MatchListTable:
     Type: AWS::DynamoDB::Table
