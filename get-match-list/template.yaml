@@ -1,45 +1,33 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: "AWS::Serverless-2016-10-31"
-Description: valorant-match-schedule
+Description: valorant-match schedule - Function invokes fetching functions
 
 Parameters:
   ScheduleExpression:
     Description: schedule expression for the eventbridge event
     Type: String
     Default: rate(6 hours)
-  MatchListTableName:
-    Description: DynamoDB table name for match list
+  FetchDailyMatchesQueueUrl:
+    Description: SQS queue url publish to
     Type: String
 
 Resources:
-  RequestsLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: requests
-      ContentUri: layer/requests/
-      CompatibleRuntimes:
-        - python3.9
-    Metadata:
-      BuildMethod: python3.9
-
   GetMatchListFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: function/
-      Description: "get valorant match list"
+      Description: "invoke fetch-daily-matches function via SQS queue publishing"
       Handler: index.lambda_handler
       Runtime: python3.9
       Architectures:
         - x86_64
       MemorySize: 128
-      Timeout: 900
+      Timeout: 180
       Policies:
-        - AmazonDynamoDBFullAccess
+        - AmazonSQSFullAccess
       Environment:
         Variables:
-          MATCHLIST_TABLE: !Ref MatchListTableName
-      Layers:
-        - !Ref RequestsLayer
+          FETCH_DAILY_MATCHES_QUEUE_URL: !Ref FetchDailyMatchesQueueUrl
       Events:
         CloudWatchEvent:
           Type: Schedule
