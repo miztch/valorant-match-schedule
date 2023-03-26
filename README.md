@@ -10,9 +10,10 @@ You can check worldwide VALORANT matches schedule in Google Calendar.
 ![architecture](image/valorant-match-schedule.drawio.svg)
 
 1. Lambda function: `get-match-list` is periodically invoked from EventBridge
-2. `get-match-list` fetches data from API service and put into DynamoDB table: `MatchList`
-3. `MatchList` table streams captures item-level data modification to Lambda function: `add-gcal-event`
-4. `add-gcal-event` creates/modifies Google Calendar events. `Outbox` table manages their state and information.
+2. `get-match-list` decides which day to fetch match information, and publishes records including specified dates strings to SQS queue: `FetchDailyMatches`
+3. `fetch-daily-matches` is triggered by `FetchDailyMatches` queue. fetches match data for a day from API service and put into DynamoDB table: `MatchList`
+4. `MatchList` table streams captures item-level data modification to Lambda function: `add-gcal-event`
+5. `add-gcal-event` creates/modifies Google Calendar events. `Outbox` table manages their state and information.
 
 ## Prerequisites
 
