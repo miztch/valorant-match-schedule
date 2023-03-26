@@ -23,11 +23,14 @@ def publish_dates():
         today + datetime.timedelta(days=d), '%Y-%m-%d') for d in range(days_to_get)]
 
     for date in dates:
-        logger.info('get matches list for a day: {}'.format(date))
+        logger.info('request to fetch match list for the day: {}'.format(date))
 
         payload = {'date': date}
         message = json.dumps(payload)
-        sqs.send_message(QueueUrl=queue_url, MessageBody=message)
+
+        response = sqs.send_message(QueueUrl=queue_url, MessageBody=message)
+        logger.info('message sent. queue:{} message: {}'.format(
+            queue_url, response))
 
 
 def lambda_handler(event, context):
