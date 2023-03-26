@@ -7,8 +7,8 @@ Parameters:
     Description: schedule expression for the eventbridge event
     Type: String
     Default: rate(6 hours)
-  MatchListTableName:
-    Description: DynamoDB table name for match list
+  FetchDailyMatchesQueueUrl:
+    Description: SQS queue url publish to
     Type: String
 
 Resources:
