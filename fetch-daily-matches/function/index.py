@@ -102,7 +102,7 @@ def map_flag_to_region(flag):
         'ca': 'NA', 'ch': 'EMEA', 'cl': 'BR_LATAM', 'cn': 'EAST_ASIA', 'cz': 'EMEA', 'de': 'EMEA',
         'dk': 'EMEA', 'ee': 'EMEA', 'eg': 'EMEA', 'es': 'EMEA', 'fi': 'EMEA', 'fr': 'EMEA',
         'gb': 'EMEA', 'gr': 'EMEA', 'hk': 'APAC', 'hu': 'EMEA', 'hr': 'EMEA', 'id': 'APAC',
-        'ie': 'EMEA', 'il': 'EMEA', 'in': 'APAC', 'is': 'EMEA', 'it': 'EMEA', 'jp': 'EAST_ASIA',
+        'ie': 'EMEA', 'il': 'EMEA', 'in': 'APAC', 'iq': 'EMEA', 'is': 'EMEA', 'it': 'EMEA', 'jp': 'EAST_ASIA',
         'kh': 'APAC', 'kr': 'EAST_ASIA', 'kw': 'EMEA', 'lt': 'EMEA', 'ma': 'EMEA', 'me': 'EMEA', 'mk': 'EMEA', 'my': 'APAC',
         'no': 'EMEA', 'pe': 'BR_LATAM', 'ph': 'APAC', 'pl': 'EMEA', 'pt': 'EMEA', 'ro': 'EMEA',
         'rs': 'EMEA', 'sa': 'APAC', 'se': 'EMEA', 'sg': 'APAC', 'si': 'EMEA', 'th': 'APAC',
