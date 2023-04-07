@@ -132,12 +132,10 @@ def fetch_daily_matches(date):
 
     logger.info('fetch matches list from: {}'.format(endpoint))
 
-    headers = {"Content-Type": "application/json"}
-
-    match_list = []
-
+    # assemble request URI and header
     logger.info('fetch matches list for a day: {}'.format(date))
     uri = endpoint + '?date=' + date
+    headers = {"Content-Type": "application/json"}
 
     # due to api endpoint's behabior, requests.get.json() sometimes fails
     # retry till valid json can be gotten
@@ -153,6 +151,7 @@ def fetch_daily_matches(date):
     matches = upcoming_matches.json()
 
     # pick up information for each individual match
+    match_list = []
     for match in matches:
 
         # get region from flag indicator
