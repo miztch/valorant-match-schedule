@@ -22,13 +22,19 @@ def publish_dates():
     dates = [datetime.datetime.strftime(
         today + datetime.timedelta(days=d), '%Y-%m-%d') for d in range(days_to_get)]
 
-    for date in dates:
+    base_delay_seconds = int(os.environ['BASE_DELAY_SECONDS'])
+    for i, date in zip(range(days_to_get), dates):
         logger.info('request to fetch match list for the day: {}'.format(date))
 
         payload = {'date': date}
         message = json.dumps(payload)
 
-        response = sqs.send_message(QueueUrl=queue_url, MessageBody=message)
+        response = sqs.send_message(
+            QueueUrl=queue_url,
+            MessageBody=message,
+            DelaySeconds=i*base_delay_seconds
+        )
+
         logger.info('message sent. queue: {} response: {}'.format(
             queue_url, response))
 

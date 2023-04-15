@@ -45,3 +45,5 @@ Resources:
           Properties:
             Queue: !Ref FetchDailyMatchesQueueArn
             BatchSize: 1
+            ScalingConfig:
+              MaximumConcurrency: 2

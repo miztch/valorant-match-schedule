@@ -10,6 +10,10 @@ Parameters:
   FetchDailyMatchesQueueUrl:
     Description: SQS queue url publish to
     Type: String
+  BaseDelaySecondsOfSendMessage:
+    Description: the delay to use as a basis for the sqs.send_message
+    Type: Number
+    Default: 30
 
 Resources:
   GetMatchListFunction:
