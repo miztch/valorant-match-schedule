@@ -98,9 +98,12 @@ def assemble_gcal_event_json(action, item):
     assemble json for creating / updating Google Calendar event
     '''
     # event_id is needed only for "ADD" action
-    # format: add "0" and an 11 digit string to match_id
+    # format: "match" + match_id + "0" + hash value
+    # this length has no decent reason
+    hash_length = 16 - len(item['match_id'])
     event_id = {
-        'id': 'match{}0{}'.format(item['match_id'], str(random.randrange(10**11, 10**12)))}
+        'id': 'match{}0{}'.format(item['match_id'], str(random.randrange(10**hash_length, 10**(hash_length+1))))
+    }
     detail = {
         'summary': '{} - {} | {} - {}'.format(item['team_home'], item['team_away'], item['event_name'], item['event_detail']),
         'description': item['match_uri'],
