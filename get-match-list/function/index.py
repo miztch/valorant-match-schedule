@@ -17,7 +17,7 @@ def publish_dates():
     publish dates to get match information to the queue
     '''
 
-    days_to_get = 30
+    days_to_get = int(os.environ['DAYS_TO_GET'])
     today = datetime.datetime.now()
     dates = [datetime.datetime.strftime(
         today + datetime.timedelta(days=d), '%Y-%m-%d') for d in range(days_to_get)]

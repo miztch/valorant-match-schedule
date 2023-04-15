@@ -14,6 +14,10 @@ Parameters:
     Description: the delay to use as a basis for the sqs.send_message
     Type: Number
     Default: 30
+  DaysToGet:
+    Description: days to get match info starting from today
+    Type: Number
+    Default: 30
 
 Resources:
   GetMatchListFunction:
@@ -32,6 +36,8 @@ Resources:
       Environment:
         Variables:
           FETCH_DAILY_MATCHES_QUEUE_URL: !Ref FetchDailyMatchesQueueUrl
+          BASE_DELAY_SECONDS: !Ref BaseDelaySecondsOfSendMessage
+          DAYS_TO_GET: !Ref DaysToGet
       Events:
         CloudWatchEvent:
           Type: Schedule

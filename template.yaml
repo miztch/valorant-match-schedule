@@ -19,6 +19,10 @@ Parameters:
     Description: schedule expression for the eventbridge event
     Type: String
     Default: rate(6 hours)
+  DaysToGet:
+    Description: days to get match info starting from today
+    Type: Number
+    Default: 30
 
 Resources:
   AddGcalEvent:
@@ -42,6 +46,7 @@ Resources:
       Parameters:
         ScheduleExpression: !Ref ScheduleExpression
         FetchDailyMatchesQueueUrl: !Ref FetchDailyMatchesQueue
+        DaysToGet: !Ref DaysToGet
 
   FetchDailyMatches:
     Type: AWS::Serverless::Application
