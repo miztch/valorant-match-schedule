@@ -13,7 +13,7 @@ Parameters:
   BaseDelaySecondsOfSendMessage:
     Description: the delay to use as a basis for the sqs.send_message
     Type: Number
-    Default: 30
+    Default: 60
   DaysToGet:
     Description: days to get match info starting from today
     Type: Number
