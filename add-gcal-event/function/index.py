@@ -59,18 +59,24 @@ def deserialize(image):
     return d
 
 
-def put_event_id(match_id, calendar_id, event_id):
+def put_event_id(match_id, calendar_id, event_id, matchlist_ttl):
     '''
     put item into outbox DynamoDB Table including
         - match_id
         - calendar id (of Google Calendar)
         - event_id (of Google Calendar)
+        - ttl
     '''
+
+    # outbox table ttl: matchlist_ttl + 7 days
+    outbox_ttl = matchlist_ttl + 60 * 60 * 24 * 7
+
     table.put_item(
         Item={
             'match_id': match_id,
             'calendar_id': calendar_id,
-            'event_id': event_id
+            'event_id': event_id,
+            'ttl': outbox_ttl
         }
     )
 
@@ -134,7 +140,7 @@ def add_gcal_event(service_account_id, calendar_id, item):
     try:
         logger.info('insert new event: {}'.format(body))
         result = service.events().insert(calendarId=calendar_id, body=body).execute()
-        put_event_id(item['match_id'], calendar_id, body['id'])
+        put_event_id(item['match_id'], calendar_id, body['id'], item['ttl'])
     except Exception as e:
         raise e
 
@@ -153,7 +159,7 @@ def update_gcal_event(service_account_id, calendar_id, item, event_id):
         logger.info('update existing event: {}'.format(body))
         result = service.events().update(calendarId=calendar_id,
                                          eventId=event_id, body=body).execute()
-        put_event_id(item['match_id'], calendar_id, event_id)
+        put_event_id(item['match_id'], calendar_id, event_id, item['ttl'])
     except Exception as e:
         raise e
 
