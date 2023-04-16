@@ -32,7 +32,7 @@ def publish_dates():
         response = sqs.send_message(
             QueueUrl=queue_url,
             MessageBody=message,
-            DelaySeconds=i*base_delay_seconds
+            DelaySeconds=min(i*base_delay_seconds, 900)
         )
 
         logger.info('message sent. queue: {} response: {}'.format(
