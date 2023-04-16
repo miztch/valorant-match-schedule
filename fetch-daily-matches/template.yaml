@@ -9,6 +9,10 @@ Parameters:
   MatchListTableName:
     Description: DynamoDB table name for match list
     Type: String
+  DaysToRetainLogs:
+    Description: days to retain logs in CloudWatch
+    Type: Number
+    Default: 30
 
 Resources:
   RequestsLayer:
@@ -47,3 +51,9 @@ Resources:
             BatchSize: 1
             ScalingConfig:
               MaximumConcurrency: 2
+
+  FunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${FetchDailyMatchesFunction}
+      RetentionInDays: !Ref DaysToRetainLogs

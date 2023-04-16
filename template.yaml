@@ -23,6 +23,10 @@ Parameters:
     Description: days to get match info starting from today
     Type: Number
     Default: 30
+  DaysToRetainLogs:
+    Description: days to retain logs in CloudWatch
+    Type: Number
+    Default: 30
 
 Resources:
   AddGcalEvent:
@@ -38,6 +42,7 @@ Resources:
         CalendarIdNa: !Ref CalendarIdNa
         MatchListTableArn: !GetAtt MatchListTable.StreamArn
         OutboxTableName: !Ref OutboxTable
+        DaysToRetainLogs: !Ref DaysToRetainLogs
 
   GetMatchList:
     Type: AWS::Serverless::Application
@@ -47,6 +52,7 @@ Resources:
         ScheduleExpression: !Ref ScheduleExpression
         FetchDailyMatchesQueueUrl: !Ref FetchDailyMatchesQueue
         DaysToGet: !Ref DaysToGet
+        DaysToRetainLogs: !Ref DaysToRetainLogs
 
   FetchDailyMatches:
     Type: AWS::Serverless::Application
@@ -55,6 +61,7 @@ Resources:
       Parameters:
         FetchDailyMatchesQueueArn: !GetAtt FetchDailyMatchesQueue.Arn
         MatchListTableName: !Ref MatchListTable
+        DaysToRetainLogs: !Ref DaysToRetainLogs
 
   FetchDailyMatchesQueue:
     Type: AWS::SQS::Queue

@@ -18,6 +18,10 @@ Parameters:
     Description: days to get match info starting from today
     Type: Number
     Default: 30
+  DaysToRetainLogs:
+    Description: days to retain logs in CloudWatch
+    Type: Number
+    Default: 30
 
 Resources:
   GetMatchListFunction:
@@ -43,3 +47,9 @@ Resources:
           Type: Schedule
           Properties:
             Schedule: !Ref ScheduleExpression
+
+  FunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${GetMatchListFunction}
+      RetentionInDays: !Ref DaysToRetainLogs

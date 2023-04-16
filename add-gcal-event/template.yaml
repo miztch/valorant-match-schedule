@@ -19,6 +19,10 @@ Parameters:
     Type: String
   OutboxTableName:
     Type: String
+  DaysToRetainLogs:
+    Description: days to retain logs in CloudWatch
+    Type: Number
+    Default: 30
 
 Resources:
   GoogleAuthLayer:
@@ -77,3 +81,9 @@ Resources:
             BisectBatchOnFunctionError: true
             Enabled: true
             StartingPosition: TRIM_HORIZON
+
+  FunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AddGcalEventFunction}
+      RetentionInDays: !Ref DaysToRetainLogs
