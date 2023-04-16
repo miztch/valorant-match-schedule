@@ -74,7 +74,7 @@ Resources:
     Properties: 
       AttributeDefinitions: 
         - AttributeName: match_id
-          AttributeType: S
+          AttributeType: N
       BillingMode: PROVISIONED
       KeySchema: 
         - AttributeName: match_id
@@ -93,7 +93,7 @@ Resources:
     Properties: 
       AttributeDefinitions: 
         - AttributeName: match_id
-          AttributeType: S
+          AttributeType: N
       BillingMode: PROVISIONED
       KeySchema: 
         - AttributeName: match_id

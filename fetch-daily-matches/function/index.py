@@ -162,7 +162,7 @@ def fetch_daily_matches(date):
         if not region:
             continue
 
-        match_id = str(match['id'])
+        match_id = match['id']
         teams = [team['title'] for team in match['teams']]
         event_name = shorten(match['eventName'])
 
@@ -177,7 +177,7 @@ def fetch_daily_matches(date):
         # match url
         slugs = '-'.join([team['slug'] for team in match['teams']])
         prefix = "https://www.thespike.gg/match"
-        match_uri = "/".join([prefix, slugs, match_id])
+        match_uri = "/".join([prefix, slugs, str(match_id)])
 
         # assemble item as a dictionary
         item = {
