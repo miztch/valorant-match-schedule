@@ -106,7 +106,7 @@ def assemble_gcal_event_json(action, item):
     # event_id is needed only for "ADD" action
     # format: "match" + match_id + "0" + hash value
     # this length has no decent reason
-    hash_length = 16 - len(item['match_id'])
+    hash_length = 16 - len(str(item['match_id']))
     event_id = {
         'id': 'match{}0{}'.format(item['match_id'], str(random.randrange(10**hash_length, 10**(hash_length+1))))
     }
