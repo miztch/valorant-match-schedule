@@ -120,12 +120,22 @@ def map_flag_to_region(flag, region_map):
     return region
 
 
+def is_event_international(international_events, event_name):
+    '''
+    judge if international event or not
+    '''
+    result = True if event_name in international_events else False
+
+    return result
+
+
 def fetch_daily_matches(date):
     '''
     fetch match information for the specified day from api endpoint
     '''
     # configure datasource
     region_map = load_json("./countries.json")
+    international_events = load_json("./international_events.json")
     endpoint = "https://api.thespike.gg/matches"
 
     logger.info('fetch matches list from: {}'.format(endpoint))
@@ -151,7 +161,6 @@ def fetch_daily_matches(date):
     # pick up information for each individual match
     match_list = []
     for match in matches:
-
         # get region from flag indicator
         # skip if empty so that "Calendar Id" for Gcal cannot be determined
         flag = match['eventCountryFlag']
@@ -163,6 +172,10 @@ def fetch_daily_matches(date):
         match_id = match['id']
         teams = [team['title'] for team in match['teams']]
         event_name = shorten(match['eventName'])
+
+        # if international league match(ex. EMEA,Americas,Pacific)
+        if is_event_international(international_events, event_name):
+            region += '#INTERNATIONAL'
 
         # day x, upper/lower bracket, etc
         event_detail = shorten(match['matchName'])

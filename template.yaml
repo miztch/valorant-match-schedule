@@ -15,6 +15,8 @@ Parameters:
     Type: String
   CalendarIdNa:
     Type: String
+  CalendarIdInternational:
+    Type: String
   ScheduleExpression:
     Description: schedule expression for the eventbridge event
     Type: String
@@ -40,6 +42,7 @@ Resources:
         CalendarIdEastAsia: !Ref CalendarIdEastAsia
         CalendarIdEmea: !Ref CalendarIdEmea
         CalendarIdNa: !Ref CalendarIdNa
+        CalendarIdInternational: !Ref CalendarIdInternational
         MatchListTableArn: !GetAtt MatchListTable.StreamArn
         OutboxTableName: !Ref OutboxTable
         DaysToRetainLogs: !Ref DaysToRetainLogs
@@ -94,10 +97,14 @@ Resources:
       AttributeDefinitions: 
         - AttributeName: match_id
           AttributeType: N
+        - AttributeName: calendar_id
+          AttributeType: S
       BillingMode: PROVISIONED
       KeySchema: 
         - AttributeName: match_id
           KeyType: HASH
+        - AttributeName: calendar_id
+          KeyType: RANGE
       ProvisionedThroughput: 
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1

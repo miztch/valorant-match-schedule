@@ -15,6 +15,8 @@ Parameters:
     Type: String
   CalendarIdNa:
     Type: String
+  CalendarIdInternational:
+    Type: String
   MatchListTableArn:
     Type: String
   OutboxTableName:
@@ -69,6 +71,7 @@ Resources:
           CALENDAR_ID_EAST_ASIA: !Ref CalendarIdEastAsia
           CALENDAR_ID_EMEA: !Ref CalendarIdEmea
           CALENDAR_ID_NA: !Ref CalendarIdNa
+          CALENDAR_ID_INTERNATIONAL: !Ref CalendarIdInternational
       Layers:
         - !Ref GoogleAuthLayer
         - !Ref GoogleApiPythonClientLayer
