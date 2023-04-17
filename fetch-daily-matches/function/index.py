@@ -65,8 +65,6 @@ def shorten(string):
     abbrs = {
         'VALORANT Champions Tour': 'VCT',
         'Last Chance Qualifier': 'LCQ',
-        '2022 ': '',
-        '2023 ': '',
         'North America': 'NA'
     }
 
