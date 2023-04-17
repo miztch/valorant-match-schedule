@@ -68,8 +68,8 @@ def put_event_id(match_id, calendar_id, event_id, matchlist_ttl):
         - ttl
     '''
 
-    # outbox table ttl: matchlist_ttl + 7 days
-    outbox_ttl = matchlist_ttl + 60 * 60 * 24 * 7
+    # outbox table ttl: matchlist_ttl + 30 days
+    outbox_ttl = matchlist_ttl + 60 * 60 * 24 * 30
 
     table.put_item(
         Item={
