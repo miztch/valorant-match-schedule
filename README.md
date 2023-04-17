@@ -25,7 +25,7 @@ If you want to do it yourself, you should be ready with:
     cp google_key.json valorant-match-schedule/add-gcal-event/function/google_key.json
     ```
 - calendars and their ids for each regions: see [here](https://docs.simplecalendar.io/find-google-calendar-id/)
-  - 5 calendars are needed. (for `EMEA`, `NA`, `BR/LATAM`, `APAC`, `EAST_ASIA`)
+  - 6 calendars are needed. (for `EMEA`, `NA`, `BR/LATAM`, `APAC`, `EAST_ASIA`, `INTERNATIONAL`)
 
 ## Provisioning
 

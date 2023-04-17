@@ -42,7 +42,8 @@ def map_region_to_calendar(region):
         'BR_LATAM': os.environ['CALENDAR_ID_BR_LATAM'],
         'EAST_ASIA': os.environ['CALENDAR_ID_EAST_ASIA'],
         'EMEA': os.environ['CALENDAR_ID_EMEA'],
-        'NA': os.environ['CALENDAR_ID_NA']
+        'NA': os.environ['CALENDAR_ID_NA'],
+        'INTERNATIONAL': os.environ['CALENDAR_ID_INTERNATIONAL']
     }
 
     calendar_id = calendars[region]
@@ -68,8 +69,8 @@ def put_event_id(match_id, calendar_id, event_id, matchlist_ttl):
         - ttl
     '''
 
-    # outbox table ttl: matchlist_ttl + 7 days
-    outbox_ttl = matchlist_ttl + 60 * 60 * 24 * 7
+    # outbox table ttl: matchlist_ttl + 30 days
+    outbox_ttl = matchlist_ttl + 60 * 60 * 24 * 30
 
     table.put_item(
         Item={
@@ -81,21 +82,28 @@ def put_event_id(match_id, calendar_id, event_id, matchlist_ttl):
     )
 
 
-def if_gcal_event_registered(match_id):
+def if_gcal_event_registered(match_id, calendar_id):
     '''
     two functions
       - check if the Google Calendar event is already registered
         - outbox DynamoDB table has its status as an item
       - get event_id of Google Calendar from match_id in outbox DynamoDB Table
     '''
-    record = table.get_item(Key={'match_id': match_id})
+
+    record = table.get_item(
+        Key={
+            'match_id': match_id,
+            'calendar_id': calendar_id
+        }
+    )
+
     if 'Item' in record:
         logger.info(
-            'match id: {} found to already be registered'.format(match_id))
+            'match id: {} found to already be registered in calendar id: {}'.format(match_id, calendar_id))
         return True, record['Item']['event_id']
     else:
         logger.info(
-            'match id: {} was not found to be registered yet'.format(match_id))
+            'match id: {} was not found to be registered in calendar id: {} yet'.format(match_id, calendar_id))
         return False, ''
 
 
@@ -180,18 +188,22 @@ def lambda_handler(event, context):
             image = record['dynamodb']['NewImage']
             item = deserialize(image)
 
-            calendar_id = map_region_to_calendar(item['region'])
+            # item['region'] can be like "EMEA" or "EMEA#INTERNATIONAL"
+            # if internal event, add event to two calendars
+            regions = item['region'].split('#')
+            for region in regions:
+                calendar_id = map_region_to_calendar(region)
 
-            try:
-                # Outbox DynamoDB Table has record = already registered
-                already_registered, event_id = if_gcal_event_registered(
-                    item['match_id'])
+                try:
+                    # Outbox DynamoDB Table has record = already registered
+                    already_registered, event_id = if_gcal_event_registered(
+                        item['match_id'], calendar_id)
 
-                if already_registered:
-                    update_gcal_event(service_account_id,
-                                      calendar_id, item, event_id)
-                else:
-                    add_gcal_event(service_account_id, calendar_id, item)
+                    if already_registered:
+                        update_gcal_event(service_account_id,
+                                          calendar_id, item, event_id)
+                    else:
+                        add_gcal_event(service_account_id, calendar_id, item)
 
-            except Exception as e:
-                raise e
+                except Exception as e:
+                    raise e

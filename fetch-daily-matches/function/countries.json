@@ -270,9 +270,5 @@
     {
         "country_code": "usa-ca",
         "region": "NA"
-    },
-    {
-        "country_code": "world",
-        "region": "EMEA"
     }
 ]
