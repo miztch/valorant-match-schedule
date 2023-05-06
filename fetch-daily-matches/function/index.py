@@ -8,6 +8,8 @@ import time
 import boto3
 import requests
 
+import constants
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
@@ -23,16 +25,6 @@ def insert(table, match_list):
         for match in match_list:
             logger.info('put match info into the table: {}'.format(match))
             batch.put_item({k: v for k, v in match.items()})
-
-
-def load_json(file_name):
-    '''
-    get json object from file and return as dict
-    '''
-    with open(file_name) as file:
-        dict = json.load(file)
-
-    return dict
 
 
 def is_json(json_str):
@@ -62,11 +54,7 @@ def shorten(string):
     shorten strings for visibility in Google Calendar.
     '''
     shorten_string = string
-    abbrs = {
-        'VALORANT Champions Tour': 'VCT',
-        'Last Chance Qualifier': 'LCQ',
-        'North America': 'NA'
-    }
+    abbrs = constants.abbrs
 
     if shorten_string is None:
         shorten_string = ''
@@ -105,14 +93,8 @@ def map_flag_to_region(flag, region_map):
     get flag(usually it shows country) indicator and return region
     '''
 
-    map = [country for country in region_map if country['country_code'] == flag]
-
-    if map:
-        region = map[0]['region']
-    elif len(map) >= 2:
-        logger.warning(
-            "region map returned multiple records for the flag: {}".format(flag))
-        region = ''
+    if flag in region_map:
+        region = region_map[flag]
     else:
         logger.warning("no region map has found for the flag: {}".format(flag))
         region = ''
@@ -134,8 +116,8 @@ def fetch_daily_matches(date):
     fetch match information for the specified day from api endpoint
     '''
     # configure datasource
-    region_map = load_json("./countries.json")
-    international_events = load_json("./international_events.json")
+    region_map = constants.countries
+    international_events = constants.international_events
     endpoint = "https://api.thespike.gg/matches"
 
     logger.info('fetch matches list from: {}'.format(endpoint))
@@ -143,7 +125,7 @@ def fetch_daily_matches(date):
     # assemble request URI and header
     logger.info('fetch matches list for a day: {}'.format(date))
     uri = endpoint + '?date=' + date
-    headers = {"Content-Type": "application/json"}
+    headers = constants.headers
 
     # due to api endpoint's behabior, requests.get.json() sometimes fails
     # retry till valid json can be gotten
