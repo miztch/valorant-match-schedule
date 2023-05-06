@@ -102,15 +102,6 @@ def map_flag_to_region(flag, region_map):
     return region
 
 
-def is_event_international(international_events, event_name):
-    '''
-    judge if international event or not
-    '''
-    result = True if event_name in international_events else False
-
-    return result
-
-
 def fetch_daily_matches(date):
     '''
     fetch match information for the specified day from api endpoint
@@ -156,7 +147,7 @@ def fetch_daily_matches(date):
         event_name = shorten(match['eventName'])
 
         # if international league match(ex. EMEA,Americas,Pacific)
-        if is_event_international(international_events, event_name):
+        if event_name in international_events:
             region += '#INTERNATIONAL'
 
         # day x, upper/lower bracket, etc
