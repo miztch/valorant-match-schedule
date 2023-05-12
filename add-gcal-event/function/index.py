@@ -24,7 +24,7 @@ def get_gcal_credentials():
     scopes = ['https://www.googleapis.com/auth/calendar']
 
     credentials = google.auth.load_credentials_from_file(
-        './google_key.json', scopes)[0]
+        './service_account_key.json', scopes)[0]
 
     service = googleapiclient.discovery.build(
         'calendar', 'v3', credentials=credentials)

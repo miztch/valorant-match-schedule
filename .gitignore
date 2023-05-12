@@ -1,4 +1,4 @@
 .aws-sam*
 samconfig.toml
-google_key.json
+service_account_key.json
 *.drawio
