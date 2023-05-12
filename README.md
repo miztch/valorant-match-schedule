@@ -18,11 +18,11 @@ You can check worldwide VALORANT matches schedule in Google Calendar.
 ## Prerequisites
 
 If you want to do it yourself, you should be ready with:
-- account keys for Google Cloud IAM ( `google_key.json` ): see [here](https://cloud.google.com/iam/docs/creating-managing-service-account-keys)
+- service account keys for Google Cloud IAM ( `service_account_key.json` ): see [here](https://cloud.google.com/iam/docs/creating-managing-service-account-keys)
 
     ```bash
     git clone https://github.com/miztch/valorant-match-schedule
-    cp google_key.json valorant-match-schedule/add-gcal-event/function/google_key.json
+    cp service_account_key.json valorant-match-schedule/add-gcal-event/function/service_account_key.json
     ```
 - calendars and their ids for each regions: see [here](https://docs.simplecalendar.io/find-google-calendar-id/)
   - 6 calendars are needed. (for `EMEA`, `NA`, `BR/LATAM`, `APAC`, `EAST_ASIA`, `INTERNATIONAL`)
