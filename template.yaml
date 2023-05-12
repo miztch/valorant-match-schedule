@@ -74,11 +74,13 @@ Resources:
 
   MatchListTable:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
     Properties: 
       AttributeDefinitions: 
         - AttributeName: match_id
           AttributeType: N
       BillingMode: PROVISIONED
+      DeletionProtectionEnabled: True
       KeySchema: 
         - AttributeName: match_id
           KeyType: HASH
@@ -93,6 +95,7 @@ Resources:
 
   OutboxTable:
     Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
     Properties: 
       AttributeDefinitions: 
         - AttributeName: match_id
@@ -100,6 +103,7 @@ Resources:
         - AttributeName: calendar_id
           AttributeType: S
       BillingMode: PROVISIONED
+      DeletionProtectionEnabled: True
       KeySchema: 
         - AttributeName: match_id
           KeyType: HASH
