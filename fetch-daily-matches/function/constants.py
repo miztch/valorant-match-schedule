@@ -16,7 +16,8 @@ international_events = [
     'VCT 2023 - EMEA League',
     'VCT 2023 - Pacific League',
     'VCT 2023 - Americas League',
-    'VCT 2023 - Masters Tokyo'
+    'VCT 2023 - Masters Tokyo',
+    'VCT 2023 - Champions'
 ]
 
 abbrs = {
