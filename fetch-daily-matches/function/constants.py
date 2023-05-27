@@ -12,11 +12,15 @@ countries = {
     'latam': 'BR_LATAM', 'nordic': 'EMEA', 'oce': 'APAC', 'south-asia': 'APAC', 'southeast-asia': 'APAC', 'usa-ca': 'NA'
 }
 
+# event name is after shortened
 international_events = [
     'VCT 2023 - EMEA League',
     'VCT 2023 - Pacific League',
     'VCT 2023 - Americas League',
     'VCT 2023 - Masters Tokyo',
+    'VCT 2023 - Pacific League - LCQ',
+    'VCT 2023 - EMEA League - LCQ',
+    'VCT 2023 - Americas League - LCQ',
     'VCT 2023 - Champions'
 ]
 
