@@ -4,7 +4,7 @@ You can check worldwide VALORANT matches schedule in Google Calendar.
 
 ## Public URL
 
-- TBA
+- TBA **(Roadmap: after integrated with [dima](https://github.com/miztch/dima) and [sasha](https://github.com/miztch/sasha), it comes!)**
 
 ## Architecture overview
 ![architecture](image/valorant-match-schedule.drawio.svg)
