@@ -1,68 +1,15 @@
 import datetime
 import json
 import logging
-import os
-import random
-import time
 
 import boto3
-import requests
-
 import constants
+import database
+import requests
+import utils
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
-
-dynamodb = boto3.resource('dynamodb')
-table = dynamodb.Table(os.environ['MATCHLIST_TABLE'])
-
-
-def insert(table, match_list):
-    '''
-    put items into specified DynamoDB table.
-    '''
-    with table.batch_writer() as batch:
-        for match in match_list:
-            logger.info('put match info into the table: {}'.format(match))
-            batch.put_item({k: v for k, v in match.items()})
-
-
-def is_json(json_str):
-    '''
-    judge if json_str is valid.
-    '''
-    result = False
-    try:
-        json.loads(json_str)
-        result = True
-    except json.JSONDecodeError as jde:
-        logger.info('got invalid response json, retrying.')
-
-    return result
-
-
-def sleep():
-    '''
-    sleep for 1~10 secs (randomly)
-    '''
-    sec = random.randint(1, 10)
-    time.sleep(sec)
-
-
-def shorten(string):
-    '''
-    shorten strings for visibility in Google Calendar.
-    '''
-    shorten_string = string
-    abbrs = constants.abbrs
-
-    if shorten_string is None:
-        shorten_string = ''
-    else:
-        for k, v in abbrs.items():
-            shorten_string = shorten_string.replace(k, v)
-
-    return shorten_string
 
 
 def calc_match_end_time(start_time, best_of):
@@ -122,9 +69,9 @@ def fetch_daily_matches(date):
     # retry till valid json can be gotten
     upcoming_matches = ''
     while True:
-        sleep()
+        utils.sleep()
         upcoming_matches = requests.get(uri, headers=headers)
-        valid_json = is_json(upcoming_matches.text)
+        valid_json = utils.is_json(upcoming_matches.text)
 
         if valid_json:
             break
@@ -144,14 +91,14 @@ def fetch_daily_matches(date):
 
         match_id = match['id']
         teams = [team['title'] for team in match['teams']]
-        event_name = shorten(match['eventName'])
+        event_name = utils.shorten(match['eventName'])
 
         # if international league match(ex. EMEA,Americas,Pacific)
         if event_name in international_events:
             region += '#INTERNATIONAL'
 
         # day x, upper/lower bracket, etc
-        event_detail = shorten(match['matchName'])
+        event_detail = utils.shorten(match['matchName'])
 
         start_time = match['startTime']
         best_of = match['bestOf'] if type(match['bestOf']) is int else '3'
@@ -200,7 +147,7 @@ def lambda_handler(event, context):
         matches = fetch_daily_matches(date)
         match_list.extend(matches)
 
-    insert(table, match_list)
+    database.insert(match_list)
 
     return {
         'matches_count': len(match_list)
