@@ -2,6 +2,10 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - ".github/workflows/*"
+      - "**.svg"
+      - "**.md"      
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -29,6 +33,7 @@ jobs:
           echo $GOOGLE_SERVICE_ACCOUNT_KEY | base64 -d > add-gcal-event/function/service_account_key.json
       - name: Prepare SAM parameters
         env:
+          API_ENDPOINT_DOMAIN_NAME: ${{ secrets.API_ENDPOINT_DOMAIN_NAME }}
           GOOGLE_SERVICE_ACCOUNT_ID: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_ID }}
           GCAL_ID_APAC: ${{ vars.GCAL_ID_APAC }}
           GCAL_ID_BR_LATAM: ${{ vars.GCAL_ID_BR_LATAM }}
@@ -41,7 +46,8 @@ jobs:
           DAYS_TO_RETAIN_LOGS: ${{ vars.DAYS_TO_RETAIN_LOGS }}
         run: |
           tee params.json << EOF
-          {
+          { 
+            "APIEndpointDomainName": "${API_ENDPOINT_DOMAIN_NAME}",
             "GoogleServiceAccountId": "${GOOGLE_SERVICE_ACCOUNT_ID}",
             "CalendarIdApac": "${GCAL_ID_APAC}",
             "CalendarIdBrLatam": "${GCAL_ID_BR_LATAM}",
