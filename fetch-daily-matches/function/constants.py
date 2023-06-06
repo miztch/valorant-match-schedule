@@ -6,7 +6,7 @@ countries = {
     'in': 'APAC', 'iq': 'EMEA', 'is': 'EMEA', 'it': 'EMEA', 'jp': 'EAST_ASIA', 'kh': 'APAC',
     'kr': 'EAST_ASIA', 'kw': 'EMEA', 'lt': 'EMEA', 'ma': 'EMEA', 'me': 'EMEA', 'mk': 'EMEA',
     'my': 'APAC', 'no': 'EMEA', 'pe': 'BR_LATAM', 'ph': 'APAC', 'pl': 'EMEA', 'pt': 'EMEA',
-    'ro': 'EMEA', 'rs': 'EMEA', 'sa': 'APAC', 'se': 'EMEA', 'sg': 'APAC', 'si': 'EMEA',
+    'ro': 'EMEA', 'rs': 'EMEA', 'sa': 'EMEA', 'se': 'EMEA', 'sg': 'APAC', 'si': 'EMEA',
     'th': 'APAC', 'tr': 'EMEA', 'tw': 'APAC', 'ua': 'EMEA', 'us': 'NA', 'vn': 'APAC',
     'asia-pacific': 'APAC', 'benelux': 'EMEA', 'cis': 'EMEA', 'dach': 'EMEA', 'east-asia': 'EAST_ASIA', 'eu': 'EMEA',
     'latam': 'BR_LATAM', 'nordic': 'EMEA', 'oce': 'APAC', 'south-asia': 'APAC', 'southeast-asia': 'APAC', 'usa-ca': 'NA'
@@ -18,7 +18,8 @@ compellations = [
             'SEA',
             'Asia Pacific',
             'Asia-Pacific',
-            'East Asia'
+            'Southeast Asia',
+            'Oceania'
         ]
     },
     {
