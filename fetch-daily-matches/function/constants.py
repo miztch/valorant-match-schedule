@@ -12,16 +12,60 @@ countries = {
     'latam': 'BR_LATAM', 'nordic': 'EMEA', 'oce': 'APAC', 'south-asia': 'APAC', 'southeast-asia': 'APAC', 'usa-ca': 'NA'
 }
 
+compellations = [
+    {
+        'APAC': [
+            'SEA',
+            'Asia Pacific',
+            'Asia-Pacific',
+            'East Asia'
+        ]
+    },
+    {
+        'BR_LATAM': [
+            'LATAM',
+            'Latin America',
+            'LA-N',
+            'LA-S' 
+        ]
+    },
+    {
+        'EAST_ASIA': [
+            'East Asia',
+            'KR/JP'
+        ]
+    },
+    {
+        'EMEA': [
+            'Europe',
+            'Europian',
+            'CIS',
+            'MENA',
+            'Middle East',
+            'Arab',
+            'Arabia',
+            'Arabian',
+            'Arabic',
+            'Africa',
+            'ESTAZ',
+            'GLA'
+        ]
+    },
+    {
+        'NA': []
+    }
+]
+
 # event name is after shortened
 international_events = [
-    'VCT 2023 - EMEA League',
-    'VCT 2023 - Pacific League',
-    'VCT 2023 - Americas League',
-    'VCT 2023 - Masters Tokyo',
-    'VCT 2023 - Pacific League - LCQ',
-    'VCT 2023 - EMEA League - LCQ',
-    'VCT 2023 - Americas League - LCQ',
-    'VCT 2023 - Champions'
+    'Champions Tour 2023: EMEA League',
+    'Champions Tour 2023: Pacific League',
+    'Champions Tour 2023: Americas League',
+    'Champions Tour 2023: Masters Tokyo',
+    'Champions Tour 2023: Pacific LCQ',
+    'Champions Tour 2023: EMEA LCQ',
+    'Champions Tour 2023: Americas LCQ',
+    'Valorant Champions 2023'
 ]
 
 abbrs = {

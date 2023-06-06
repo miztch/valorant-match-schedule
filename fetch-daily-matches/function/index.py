@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+import os
 
 import boto3
 import constants
@@ -35,13 +36,45 @@ def calc_match_end_time(start_time, best_of):
     return end_time_str, ttl
 
 
-def map_flag_to_region(flag, region_map):
+def estimate_unspecified_region(event_name):
+    '''
+    fallback function for map_flag_to_region()
+    return a region name estimated from event name or something else,
+    or empty string if not matched any of patterns.
+    '''
+    logger.info('estimate region for event: {}'.format(event_name))
+    compellations = constants.compellations
+
+    region = ''
+
+    for regions in compellations:
+        for k,v in regions.items():
+            region_code = k
+            region_compellations = v
+            for compellation in region_compellations:
+                if compellation in event_name:
+                    region = region_code
+                    logger.info('event: {} mapped to region: {}. matched word: {}'.format(event_name, region, compellation))
+                    break
+
+    if not region:
+        logger.warn('event: {} was not mapped to any region'.format(event_name))
+
+    return region
+
+
+def map_flag_to_region(flag, region_map, event_name):
     '''
     get flag(usually it shows country) indicator and return region
     '''
 
     if flag in region_map:
         region = region_map[flag]
+    elif flag == 'un':
+        # 'un' flag is sometimes used in vlr.gg
+        # usually for LATAM, MENA, APAC. Try to estimate from event name.
+        logger.warning("flag 'un': needs fallback. event_name: {}".format(event_name))
+        region = estimate_unspecified_region(event_name)
     else:
         logger.warning("no region map has found for the flag: {}".format(flag))
         region = ''
@@ -56,7 +89,9 @@ def fetch_daily_matches(date):
     # configure datasource
     region_map = constants.countries
     international_events = constants.international_events
-    endpoint = "https://api.thespike.gg/matches"
+    
+    domain = os.environ['API_DOMAIN_NAME']
+    endpoint = 'https://' + domain + '/matches'
 
     logger.info('fetch matches list from: {}'.format(endpoint))
 
@@ -84,14 +119,14 @@ def fetch_daily_matches(date):
         # get region from flag indicator
         # skip if empty so that "Calendar Id" for Gcal cannot be determined
         flag = match['eventCountryFlag']
-        region = map_flag_to_region(flag, region_map)
+        event_name = utils.shorten(match['eventName'])
+        region = map_flag_to_region(flag, region_map, event_name)
 
         if not region:
             continue
 
         match_id = match['id']
         teams = [team['title'] for team in match['teams']]
-        event_name = utils.shorten(match['eventName'])
 
         # if international league match(ex. EMEA,Americas,Pacific)
         if event_name in international_events:
@@ -106,9 +141,7 @@ def fetch_daily_matches(date):
         end_time, ttl = calc_match_end_time(start_time, int(best_of))
 
         # match url
-        slugs = '-'.join([team['slug'] for team in match['teams']])
-        prefix = "https://www.thespike.gg/match"
-        match_uri = "/".join([prefix, slugs, str(match_id)])
+        match_uri = 'https://vlr.gg{}'.format(match['match_page'])
 
         # assemble item as a dictionary
         item = {
