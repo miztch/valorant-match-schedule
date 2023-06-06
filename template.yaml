@@ -3,6 +3,11 @@ Transform: "AWS::Serverless-2016-10-31"
 Description: valorant-match-schedule
 
 Parameters:
+  APIEndpointDomainName:
+    Description: Domain name of API endpoint URL of dima (matches API)
+    Type: String
+    AllowedPattern: ^([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$
+    ConstraintDescription: should be appropriate domain format
   GoogleServiceAccountId:
     Type: String
   CalendarIdApac:
@@ -62,6 +67,7 @@ Resources:
     Properties:
       Location: fetch-daily-matches/template.yaml
       Parameters:
+        APIEndpointDomainName: !Ref APIEndpointDomainName
         FetchDailyMatchesQueueArn: !GetAtt FetchDailyMatchesQueue.Arn
         MatchListTableName: !Ref MatchListTable
         DaysToRetainLogs: !Ref DaysToRetainLogs
