@@ -141,7 +141,7 @@ def fetch_daily_matches(date):
         end_time, ttl = calc_match_end_time(start_time, int(best_of))
 
         # match url
-        match_uri = 'https://vlr.gg{}'.format(match['match_page'])
+        match_uri = 'https://vlr.gg{}'.format(match['pagePath'])
 
         # assemble item as a dictionary
         item = {
