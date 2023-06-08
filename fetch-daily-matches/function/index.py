@@ -58,7 +58,7 @@ def estimate_unspecified_region(event_name):
                     break
 
     if not region:
-        logger.warn('event: {} was not mapped to any region'.format(event_name))
+        logger.warning('event: {} was not mapped to any region'.format(event_name))
 
     return region
 
@@ -71,9 +71,9 @@ def map_flag_to_region(flag, region_map, event_name):
     if flag in region_map:
         region = region_map[flag]
     elif flag == 'un':
-        # 'un' flag is sometimes used in vlr.gg
+        # 'un' flag (shows 'universal') is sometimes used in vlr.gg
         # usually for LATAM, MENA, APAC. Try to estimate from event name.
-        logger.warning("flag 'un': needs fallback. event_name: {}".format(event_name))
+        logger.info("flag 'un': needs fallback. event_name: {}".format(event_name))
         region = estimate_unspecified_region(event_name)
     else:
         logger.warning("no region map has found for the flag: {}".format(flag))
