@@ -48,17 +48,19 @@ def estimate_unspecified_region(event_name):
     region = ''
 
     for regions in compellations:
-        for k,v in regions.items():
+        for k, v in regions.items():
             region_code = k
             region_compellations = v
             for compellation in region_compellations:
                 if compellation in event_name:
                     region = region_code
-                    logger.info('event: {} mapped to region: {}. matched word: {}'.format(event_name, region, compellation))
+                    logger.info('event: {} mapped to region: {}. matched word: {}'.format(
+                        event_name, region, compellation))
                     break
 
     if not region:
-        logger.warning('event: {} was not mapped to any region'.format(event_name))
+        logger.warning(
+            'event: {} was not mapped to any region'.format(event_name))
 
     return region
 
@@ -73,7 +75,8 @@ def map_flag_to_region(flag, region_map, event_name):
     elif flag == 'un':
         # 'un' flag (shows 'universal') is sometimes used in vlr.gg
         # usually for LATAM, MENA, APAC. Try to estimate from event name.
-        logger.info("flag 'un': needs fallback. event_name: {}".format(event_name))
+        logger.info(
+            "flag 'un': needs fallback. event_name: {}".format(event_name))
         region = estimate_unspecified_region(event_name)
     else:
         logger.warning(
@@ -90,7 +93,7 @@ def fetch_daily_matches(date):
     # configure datasource
     region_map = constants.countries
     international_events = constants.international_events
-    
+
     domain = os.environ['API_DOMAIN_NAME']
     endpoint = 'https://' + domain + '/matches'
 

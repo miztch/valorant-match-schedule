@@ -27,7 +27,7 @@ compellations = [
             'LATAM',
             'Latin America',
             'LA-N',
-            'LA-S' 
+            'LA-S'
         ]
     },
     {
