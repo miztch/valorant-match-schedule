@@ -76,7 +76,8 @@ def map_flag_to_region(flag, region_map, event_name):
         logger.info("flag 'un': needs fallback. event_name: {}".format(event_name))
         region = estimate_unspecified_region(event_name)
     else:
-        logger.warning("no region map has found for the flag: {}".format(flag))
+        logger.warning(
+            "event: {} was not mapped to any region. flag: {}".format(event_name, flag))
         region = ''
 
     return region
