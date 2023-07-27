@@ -19,6 +19,7 @@ compellations = [
             'Asia Pacific',
             'Asia-Pacific',
             'Southeast Asia',
+            'South Asia',
             'Oceania'
         ]
     },
