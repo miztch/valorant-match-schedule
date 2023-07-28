@@ -25,7 +25,7 @@ Parameters:
   ScheduleExpression:
     Description: schedule expression for the eventbridge event
     Type: String
-    Default: rate(6 hours)
+    Default: rate(3 hours)
   DaysToGet:
     Description: days to get match info starting from today
     Type: Number
