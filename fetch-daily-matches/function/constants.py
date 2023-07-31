@@ -49,6 +49,7 @@ compellations = [
             'Arabian',
             'Arabic',
             'Africa',
+            'EMG',
             'ESTAZ',
             'GLA'
         ]
