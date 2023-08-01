@@ -70,52 +70,51 @@ countries = {
     'usa-ca': 'NA'
 }
 
-compellations = [
-    {
-        'APAC': [
-            'SEA',
-            'Asia Pacific',
-            'Asia-Pacific',
-            'Southeast Asia',
-            'South Asia',
-            'Oceania'
-        ]
-    },
-    {
-        'BR_LATAM': [
-            'LATAM',
-            'Latin America',
-            'LA-N',
-            'LA-S'
-        ]
-    },
-    {
-        'EAST_ASIA': [
-            'East Asia',
-            'KR/JP'
-        ]
-    },
-    {
-        'EMEA': [
-            'Europe',
-            'Europian',
-            'CIS',
-            'MENA',
-            'Middle East',
-            'Arab',
-            'Arabia',
-            'Arabian',
-            'Arabic',
-            'Africa',
-            'EMG',
-            'ESTAZ',
-            'GLA'
-        ]
-    },
-    {
-        'NA': []
-    }
-]
+sub_areas = {
+    'APAC': [
+        'SEA',
+        'Asia Pacific',
+        'Asia-Pacific',
+        'Southeast Asia',
+        'South Asia',
+        'Oceania'
+    ],
+    'BR_LATAM': [
+        'LATAM',
+        'Latin America',
+        'LA-N',
+        'LA-S'
+    ],
+    'EAST_ASIA': [
+        'East Asia',
+        'KR/JP'
+    ],
+    'EMEA': [
+        'Europe',
+        'Europian',
+        'CIS',
+        'MENA',
+        'Middle East',
+        'Arab',
+        'Arabia',
+        'Arabian',
+        'Arabic',
+        'Africa'
+    ],
+    'NA': []
+}
+
+organizers = {
+    'APAC': [],
+    'BR_LATAM': [],
+    'EAST_ASIA': [],
+    'EMEA': [
+        'EMG',
+        'ESTAZ',
+        'GLA'
+    ],
+    'NA': []
+}
 
 # event name is after shortened
 international_events = [
@@ -135,4 +134,6 @@ abbrs = {
     'North America': 'NA'
 }
 
-headers = {"Content-Type": "application/json"}
+headers = {
+    "Content-Type": "application/json"
+}

@@ -189,7 +189,7 @@ def lambda_handler(event, context):
             item = deserialize(image)
 
             # item['region'] can be like "EMEA" or "EMEA#INTERNATIONAL"
-            # if internal event, add event to two calendars
+            # if international event, add event to two calendars
             regions = item['region'].split('#')
             for region in regions:
                 calendar_id = map_region_to_calendar(region)
