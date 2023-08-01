@@ -39,24 +39,26 @@ def calc_match_end_time(start_time, best_of):
 def estimate_unspecified_region(event_name):
     '''
     fallback function for map_flag_to_region()
-    return a region name estimated from event name or something else,
+    return a region name estimated from event name or organizer name,
     or empty string if not matched any of patterns.
     '''
     logger.info('estimate region for event: {}'.format(event_name))
-    compellations = constants.compellations
+    sub_areas = constants.sub_areas
+    organizers = constants.organizers
 
     region = ''
 
-    for regions in compellations:
-        for k, v in regions.items():
-            region_code = k
-            region_compellations = v
-            for compellation in region_compellations:
-                if compellation in event_name:
-                    region = region_code
+    # search from sub area name -> organizer name
+    for dic in [sub_areas, organizers]:
+        for region_name, strings in dic.items():
+            for string in strings:
+                if string in event_name:
+                    region = region_name
                     logger.info('event: {} mapped to region: {}. matched word: {}'.format(
-                        event_name, region, compellation))
+                        event_name, region, string))
                     break
+        if region:
+            break
 
     if not region:
         logger.warning(
