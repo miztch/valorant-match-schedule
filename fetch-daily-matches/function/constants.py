@@ -125,7 +125,8 @@ international_events = [
     'Champions Tour 2023: Pacific LCQ',
     'Champions Tour 2023: EMEA LCQ',
     'Champions Tour 2023: Americas LCQ',
-    'Valorant Champions 2023'
+    'Valorant Champions 2023',
+    'Game Changers 2023 Championship: São Paulo'
 ]
 
 abbrs = {
