@@ -9,6 +9,7 @@ countries = {
     'ch': 'EMEA',
     'cl': 'BR_LATAM',
     'cn': 'EAST_ASIA',
+    'co': 'BR_LATAM',
     'cz': 'EMEA',
     'de': 'EMEA',
     'dk': 'EMEA',
