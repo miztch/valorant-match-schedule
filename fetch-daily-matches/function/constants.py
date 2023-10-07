@@ -3,6 +3,7 @@ countries = {
     "ar": "BR_LATAM",
     "at": "EMEA",
     "ba": "EMEA",
+    "bd": "APAC",
     "be": "EMEA",
     "br": "BR_LATAM",
     "ca": "NA",
