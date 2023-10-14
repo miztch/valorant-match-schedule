@@ -26,9 +26,9 @@ Resources:
       LayerName: requests
       ContentUri: layer/requests/
       CompatibleRuntimes:
-        - python3.9
+        - python3.11
     Metadata:
-      BuildMethod: python3.9
+      BuildMethod: python3.11
 
   FetchDailyMatchesFunction:
     Type: AWS::Serverless::Function
@@ -36,7 +36,7 @@ Resources:
       CodeUri: function/
       Description: "fetch daily valorant matches"
       Handler: index.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.11
       Architectures:
         - x86_64
       MemorySize: 128
