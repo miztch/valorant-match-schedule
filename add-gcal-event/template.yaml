@@ -33,9 +33,9 @@ Resources:
       LayerName: google-auth
       ContentUri: layer/google-auth/
       CompatibleRuntimes:
-        - python3.9
+        - python3.11
     Metadata:
-      BuildMethod: python3.9
+      BuildMethod: python3.11
 
   GoogleApiPythonClientLayer:
     Type: AWS::Serverless::LayerVersion
@@ -43,9 +43,9 @@ Resources:
       LayerName: google-api-python-client
       ContentUri: layer/google-api-python-client/
       CompatibleRuntimes:
-        - python3.9
+        - python3.11
     Metadata:
-      BuildMethod: python3.9
+      BuildMethod: python3.11
 
 
   AddGcalEventFunction:
@@ -54,7 +54,7 @@ Resources:
       CodeUri: function/
       Description: "add valorant match to google calendar as a event"
       Handler: index.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.11
       Architectures:
         - x86_64
       MemorySize: 128

@@ -30,7 +30,7 @@ Resources:
       CodeUri: function/
       Description: "invoke fetch-daily-matches function via SQS queue publishing"
       Handler: index.lambda_handler
-      Runtime: python3.9
+      Runtime: python3.11
       Architectures:
         - x86_64
       MemorySize: 128
