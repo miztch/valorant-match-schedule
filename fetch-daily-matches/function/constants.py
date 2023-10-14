@@ -117,6 +117,7 @@ international_events = [
     "Champions Tour 2023: Americas LCQ",
     "Valorant Champions 2023",
     "Game Changers 2023 Championship: São Paulo",
+    "Red Bull Home Ground #4"
 ]
 
 abbrs = {
