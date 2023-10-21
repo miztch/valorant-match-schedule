@@ -116,19 +116,10 @@ def assemble_gcal_event_json(action, item):
     # format: "match" + match_id + "0" + hash value
     # this length has no decent reason
     hash_length = 16 - len(str(item["match_id"]))
-    event_id = {
-        "id": "match{}0{}".format(
-            item["match_id"],
-            str(random.randrange(10**hash_length, 10 ** (hash_length + 1))),
-        )
-    }
+    random_string = str(random.randrange(10**hash_length, 10 ** (hash_length + 1)))
+    event_id = {"id": f"match{item['match_id']}0{random_string}"}
     detail = {
-        "summary": "{} - {} | {} - {}".format(
-            item["team_home"],
-            item["team_away"],
-            item["event_name"],
-            item["event_detail"],
-        ),
+        "summary": f"{item['team_home']} - {item['team_away']} | { item['event_name']} - {item['event_detail']}",
         "description": item["match_uri"],
         "start": {
             "dateTime": item["start_time"],
