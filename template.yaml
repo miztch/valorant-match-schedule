@@ -36,41 +36,142 @@ Parameters:
     Default: 30
 
 Resources:
-  AddGcalEvent:
-    Type: AWS::Serverless::Application
+  GoogleAuthLayer:
+    Type: AWS::Serverless::LayerVersion
     Properties:
-      Location: add-gcal-event/template.yaml
-      Parameters:
-        GoogleServiceAccountId: !Ref GoogleServiceAccountId
-        CalendarIdApac: !Ref CalendarIdApac
-        CalendarIdBrLatam: !Ref CalendarIdBrLatam
-        CalendarIdEastAsia: !Ref CalendarIdEastAsia
-        CalendarIdEmea: !Ref CalendarIdEmea
-        CalendarIdNa: !Ref CalendarIdNa
-        CalendarIdInternational: !Ref CalendarIdInternational
-        MatchListTableArn: !GetAtt MatchListTable.StreamArn
-        OutboxTableName: !Ref OutboxTable
-        DaysToRetainLogs: !Ref DaysToRetainLogs
+      LayerName: google-auth
+      ContentUri: add-gcal-event/layer/google-auth/
+      CompatibleRuntimes:
+        - python3.11
+    Metadata:
+      BuildMethod: python3.11
 
-  GetMatchList:
-    Type: AWS::Serverless::Application
+  GoogleApiPythonClientLayer:
+    Type: AWS::Serverless::LayerVersion
     Properties:
-      Location: get-match-list/template.yaml
-      Parameters:
-        ScheduleExpression: !Ref ScheduleExpression
-        FetchDailyMatchesQueueUrl: !Ref FetchDailyMatchesQueue
-        DaysToGet: !Ref DaysToGet
-        DaysToRetainLogs: !Ref DaysToRetainLogs
+      LayerName: google-api-python-client
+      ContentUri: add-gcal-event/layer/google-api-python-client/
+      CompatibleRuntimes:
+        - python3.11
+    Metadata:
+      BuildMethod: python3.11
 
-  FetchDailyMatches:
-    Type: AWS::Serverless::Application
+  RequestsLayer:
+    Type: AWS::Serverless::LayerVersion
     Properties:
-      Location: fetch-daily-matches/template.yaml
-      Parameters:
-        APIEndpointDomainName: !Ref APIEndpointDomainName
-        FetchDailyMatchesQueueArn: !GetAtt FetchDailyMatchesQueue.Arn
-        MatchListTableName: !Ref MatchListTable
-        DaysToRetainLogs: !Ref DaysToRetainLogs
+      LayerName: requests
+      ContentUri: fetch-daily-matches/layer/requests/
+      CompatibleRuntimes:
+        - python3.11
+    Metadata:
+      BuildMethod: python3.11
+
+  AddGcalEventFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: add-gcal-event/function/
+      Description: "add valorant match to google calendar as a event"
+      Handler: index.lambda_handler
+      Runtime: python3.11
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 30
+      Policies:
+        - AWSLambdaDynamoDBExecutionRole
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          OUTBOX_TABLE: !Ref OutboxTable
+          GOOGLE_SERVICE_ACCOUNT_ID: !Ref GoogleServiceAccountId
+          CALENDAR_ID_APAC: !Ref CalendarIdApac
+          CALENDAR_ID_BR_LATAM: !Ref CalendarIdBrLatam
+          CALENDAR_ID_EAST_ASIA: !Ref CalendarIdEastAsia
+          CALENDAR_ID_EMEA: !Ref CalendarIdEmea
+          CALENDAR_ID_NA: !Ref CalendarIdNa
+          CALENDAR_ID_INTERNATIONAL: !Ref CalendarIdInternational
+      Layers:
+        - !Ref GoogleAuthLayer
+        - !Ref GoogleApiPythonClientLayer
+      Events:
+        Stream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt MatchListTable.StreamArn
+            BatchSize: 1
+            BisectBatchOnFunctionError: true
+            Enabled: true
+            StartingPosition: TRIM_HORIZON
+
+  AddGCalFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AddGcalEventFunction}
+      RetentionInDays: !Ref DaysToRetainLogs
+
+  GetMatchListFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: get-match-list/function/
+      Description: "invoke fetch-daily-matches function via SQS queue publishing"
+      Handler: index.lambda_handler
+      Runtime: python3.11
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 180
+      Policies:
+        - AmazonSQSFullAccess
+      Environment:
+        Variables:
+          FETCH_DAILY_MATCHES_QUEUE_URL: !Ref FetchDailyMatchesQueue
+          BASE_DELAY_SECONDS: 30
+          DAYS_TO_GET: !Ref DaysToGet
+      Events:
+        CloudWatchEvent:
+          Type: Schedule
+          Properties:
+            Schedule: !Ref ScheduleExpression
+
+  GetMatchListFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${GetMatchListFunction}
+      RetentionInDays: !Ref DaysToRetainLogs
+
+  FetchDailyMatchesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: fetch-daily-matches/function/
+      Description: "fetch daily valorant matches"
+      Handler: index.lambda_handler
+      Runtime: python3.11
+      Architectures:
+        - x86_64
+      MemorySize: 128
+      Timeout: 900
+      Policies:
+        - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          API_DOMAIN_NAME: !Ref APIEndpointDomainName
+          MATCHLIST_TABLE: !Ref MatchListTable
+      Layers:
+        - !Ref RequestsLayer
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt FetchDailyMatchesQueue.Arn
+            BatchSize: 1
+            ScalingConfig:
+              MaximumConcurrency: 2
+
+  FetchDailyMatchesFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${FetchDailyMatchesFunction}
+      RetentionInDays: !Ref DaysToRetainLogs
 
   FetchDailyMatchesQueue:
     Type: AWS::SQS::Queue
@@ -121,11 +222,3 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: true
-
-Outputs:
-  MatchListTableName:
-    Description: DynamoDB Table for match list
-    Value: !Ref MatchListTable
-  OutboxTableName:
-    Description: DynamoDB Table for outbox(store gcal event status)
-    Value: !Ref OutboxTable
