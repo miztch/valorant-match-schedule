@@ -22,5 +22,5 @@ def insert(match_list):
 
     with table.batch_writer() as batch:
         for match in match_list:
-            logger.info("put match info into the table: {}".format(match))
+            logger.info("put match info into the table: %s", match)
             batch.put_item({k: v for k, v in match.items()})
