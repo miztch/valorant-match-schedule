@@ -42,7 +42,7 @@ def estimate_unspecified_region(event_name):
     return a region name estimated from event name or organizer name,
     or empty string if not matched any of patterns.
     """
-    logger.info("estimate region for event: {}".format(event_name))
+    logger.info("estimate region for event: %s", event_name)
     sub_areas = constants.sub_areas
     organizers = constants.organizers
 
@@ -55,16 +55,17 @@ def estimate_unspecified_region(event_name):
                 if string in event_name:
                     region = region_name
                     logger.info(
-                        "event: {} mapped to region: {}. matched word: {}".format(
-                            event_name, region, string
-                        )
+                        "event: %s mapped to region: %s. matched word: %s",
+                        event_name,
+                        region,
+                        string,
                     )
                     break
         if region:
             break
 
     if not region:
-        logger.warning("event: {} was not mapped to any region".format(event_name))
+        logger.warning("event: %s was not mapped to any region", event_name)
 
     return region
 
@@ -79,11 +80,11 @@ def map_flag_to_region(flag, region_map, event_name):
     elif flag == "un":
         # 'un' flag (shows 'universal') is sometimes used in vlr.gg
         # usually for LATAM, MENA, APAC. Try to estimate from event name.
-        logger.info("flag 'un': needs fallback. event_name: {}".format(event_name))
+        logger.info("flag 'un': needs fallback. event_name: %s", event_name)
         region = estimate_unspecified_region(event_name)
     else:
         logger.warning(
-            "event: {} was not mapped to any region. flag: {}".format(event_name, flag)
+            "event: %s was not mapped to any region. flag: %s", event_name, flag
         )
         region = ""
 
@@ -101,10 +102,10 @@ def fetch_daily_matches(date):
     domain = os.environ["API_DOMAIN_NAME"]
     endpoint = "https://" + domain + "/matches"
 
-    logger.info("fetch matches list from: {}".format(endpoint))
+    logger.info("fetch matches list from: %s", endpoint)
 
     # assemble request URI and header
-    logger.info("fetch matches list for a day: {}".format(date))
+    logger.info("fetch matches list for a day: %s", date)
     uri = endpoint + "?date=" + date
     headers = constants.headers
 
@@ -149,7 +150,7 @@ def fetch_daily_matches(date):
         end_time, ttl = calc_match_end_time(start_time, int(best_of))
 
         # match url
-        match_uri = "https://vlr.gg{}".format(match["pagePath"])
+        match_uri = f"https://vlr.gg{match['pagePath']}"
 
         # assemble item as a dictionary
         item = {
@@ -169,12 +170,12 @@ def fetch_daily_matches(date):
         # first come & first served
         if match_list and item["match_id"] in [item["match_id"] for item in match_list]:
             logger.info(
-                "match data (id: {}) duplicated, skipping. match info: {}".format(
-                    item["match_id"], item
-                )
+                "match data (id: %s) duplicated, skipping. match info: %s",
+                item["match_id"],
+                item,
             )
         else:
-            logger.info("add match info to the list: {}".format(item))
+            logger.info("add match info to the list: %s", item)
             match_list.append(item)
 
     return match_list

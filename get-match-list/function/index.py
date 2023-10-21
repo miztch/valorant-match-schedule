@@ -26,7 +26,7 @@ def publish_dates():
 
     base_delay_seconds = int(os.environ["BASE_DELAY_SECONDS"])
     for i, date in zip(range(days_to_get), dates):
-        logger.info("request to fetch match list for the day: {}".format(date))
+        logger.info("request to fetch match list for the day: %s", date)
 
         payload = {"date": date}
         message = json.dumps(payload)
@@ -37,7 +37,7 @@ def publish_dates():
             DelaySeconds=min(i * base_delay_seconds, 900),
         )
 
-        logger.info("message sent. queue: {} response: {}".format(queue_url, response))
+        logger.info("message sent. queue: %s response: %s", queue_url, response)
 
 
 def lambda_handler(event, context):

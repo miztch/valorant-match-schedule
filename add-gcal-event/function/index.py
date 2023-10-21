@@ -94,16 +94,16 @@ def if_gcal_event_registered(match_id, calendar_id):
 
     if "Item" in record:
         logger.info(
-            "match id: {} found to already be registered in calendar id: {}".format(
-                match_id, calendar_id
-            )
+            "match id: %s found to already be registered in calendar id: %s",
+            match_id,
+            calendar_id,
         )
         return True, record["Item"]["event_id"]
     else:
         logger.info(
-            "match id: {} was not found to be registered in calendar id: {} yet".format(
-                match_id, calendar_id
-            )
+            "match id: %s was not found to be registered in calendar id: %s yet",
+            match_id,
+            calendar_id,
         )
         return False, ""
 
@@ -116,19 +116,10 @@ def assemble_gcal_event_json(action, item):
     # format: "match" + match_id + "0" + hash value
     # this length has no decent reason
     hash_length = 16 - len(str(item["match_id"]))
-    event_id = {
-        "id": "match{}0{}".format(
-            item["match_id"],
-            str(random.randrange(10**hash_length, 10 ** (hash_length + 1))),
-        )
-    }
+    random_string = str(random.randrange(10**hash_length, 10 ** (hash_length + 1)))
+    event_id = {"id": f"match{item['match_id']}0{random_string}"}
     detail = {
-        "summary": "{} - {} | {} - {}".format(
-            item["team_home"],
-            item["team_away"],
-            item["event_name"],
-            item["event_detail"],
-        ),
+        "summary": f"{item['team_home']} - {item['team_away']} | { item['event_name']} - {item['event_detail']}",
         "description": item["match_uri"],
         "start": {
             "dateTime": item["start_time"],
@@ -155,7 +146,7 @@ def add_gcal_event(service_account_id, calendar_id, item):
     body = assemble_gcal_event_json("ADD", item)
 
     try:
-        logger.info("insert new event: {}".format(body))
+        logger.info("insert new event: %s", body)
         result = service.events().insert(calendarId=calendar_id, body=body).execute()
         put_event_id(item["match_id"], calendar_id, body["id"], item["ttl"])
     except Exception as e:
@@ -173,7 +164,7 @@ def update_gcal_event(service_account_id, calendar_id, item, event_id):
     body = assemble_gcal_event_json("UPDATE", item)
 
     try:
-        logger.info("update existing event: {}".format(body))
+        logger.info("update existing event: %s", body)
         result = (
             service.events()
             .update(calendarId=calendar_id, eventId=event_id, body=body)
