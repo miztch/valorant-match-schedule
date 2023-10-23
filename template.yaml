@@ -40,7 +40,7 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: google-auth
-      ContentUri: add-gcal-event/layer/google-auth/
+      ContentUri: layer/google-auth/
       CompatibleRuntimes:
         - python3.11
     Metadata:
@@ -50,7 +50,7 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: google-api-python-client
-      ContentUri: add-gcal-event/layer/google-api-python-client/
+      ContentUri: layer/google-api-python-client/
       CompatibleRuntimes:
         - python3.11
     Metadata:
@@ -60,7 +60,7 @@ Resources:
     Type: AWS::Serverless::LayerVersion
     Properties:
       LayerName: requests
-      ContentUri: fetch-daily-matches/layer/requests/
+      ContentUri: layer/requests/
       CompatibleRuntimes:
         - python3.11
     Metadata:
@@ -69,7 +69,7 @@ Resources:
   AddGcalEventFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: add-gcal-event/function/
+      CodeUri: function/add-gcal-event/
       Description: "add valorant match to google calendar as a event"
       Handler: index.lambda_handler
       Runtime: python3.11
@@ -112,7 +112,7 @@ Resources:
   GetMatchListFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: get-match-list/function/
+      CodeUri: function/get-match-list/
       Description: "invoke fetch-daily-matches function via SQS queue publishing"
       Handler: index.lambda_handler
       Runtime: python3.11
@@ -142,7 +142,7 @@ Resources:
   FetchDailyMatchesFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: fetch-daily-matches/function/
+      CodeUri: function/fetch-daily-matches/
       Description: "fetch daily valorant matches"
       Handler: index.lambda_handler
       Runtime: python3.11
