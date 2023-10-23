@@ -30,7 +30,7 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
         run: |
           # base64 decode key and write out to the file
-          echo $GOOGLE_SERVICE_ACCOUNT_KEY | base64 -d > add-gcal-event/function/service_account_key.json
+          echo $GOOGLE_SERVICE_ACCOUNT_KEY | base64 -d > function/add-gcal-event/service_account_key.json
       - name: Prepare SAM parameters
         env:
           API_ENDPOINT_DOMAIN_NAME: ${{ secrets.API_ENDPOINT_DOMAIN_NAME }}
