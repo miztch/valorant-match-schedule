@@ -117,7 +117,12 @@ international_events = [
     "Champions Tour 2023: Americas LCQ",
     "Valorant Champions 2023",
     "Game Changers 2023 Championship: São Paulo",
-    "Red Bull Home Ground #4"
+    "Red Bull Home Ground #4",
+    "Champions Tour 2024: Americas Kickoff",
+    "Champions Tour 2024: Pacific Kickoff",
+    "Champions Tour 2024: EMEA Kickoff",
+    "Champions Tour 2024: China Kickoff",
+    "Champions Tour 2024: Masters Madrid",
 ]
 
 abbrs = {
