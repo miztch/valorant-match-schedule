@@ -39,6 +39,7 @@ jobs:
           echo $GOOGLE_SERVICE_ACCOUNT_KEY | base64 -d > function/add-gcal-event/service_account_key.json
       - name: Prepare SAM parameters
         env:
+          APPLICATION_NAME: "valorant-match-schedule"
           API_ENDPOINT_DOMAIN_NAME: ${{ secrets.API_ENDPOINT_DOMAIN_NAME }}
           GOOGLE_SERVICE_ACCOUNT_ID: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_ID }}
           GCAL_ID_APAC: ${{ vars.GCAL_ID_APAC }}
@@ -47,12 +48,10 @@ jobs:
           GCAL_ID_EMEA: ${{ vars.GCAL_ID_EMEA }}
           GCAL_ID_NA: ${{ vars.GCAL_ID_NA }}
           GCAL_ID_INTERNATIONAL: ${{ vars.GCAL_ID_INTERNATIONAL }}
-          SCHEDULE_EXPRESSION: ${{ vars.SCHEDULE_EXPRESSION }}
-          DAYS_TO_GET: ${{ vars.DAYS_TO_GET }}
-          DAYS_TO_RETAIN_LOGS: ${{ vars.DAYS_TO_RETAIN_LOGS }}
         run: |
           tee params.json << EOF
           { 
+            "ApplicationName": "${APPLICATION_NAME}",
             "APIEndpointDomainName": "${API_ENDPOINT_DOMAIN_NAME}",
             "GoogleServiceAccountId": "${GOOGLE_SERVICE_ACCOUNT_ID}",
             "CalendarIdApac": "${GCAL_ID_APAC}",
@@ -60,10 +59,7 @@ jobs:
             "CalendarIdEastAsia": "${GCAL_ID_EAST_ASIA}",
             "CalendarIdEmea": "${GCAL_ID_EMEA}",
             "CalendarIdNa": "${GCAL_ID_NA}",
-            "CalendarIdInternational": "${GCAL_ID_INTERNATIONAL}",
-            "ScheduleExpression": "${SCHEDULE_EXPRESSION}",
-            "DaysToGet": "${DAYS_TO_GET}",
-            "DaysToRetainLogs": "${DAYS_TO_RETAIN_LOGS}"
+            "CalendarIdInternational": "${GCAL_ID_INTERNATIONAL}"
           }
           EOF
       - name: Build SAM packages
