@@ -42,9 +42,9 @@ Resources:
       LayerName: google-auth
       ContentUri: layer/google-auth/
       CompatibleRuntimes:
-        - python3.11
+        - python3.12
     Metadata:
-      BuildMethod: python3.11
+      BuildMethod: python3.12
 
   GoogleApiPythonClientLayer:
     Type: AWS::Serverless::LayerVersion
@@ -52,9 +52,9 @@ Resources:
       LayerName: google-api-python-client
       ContentUri: layer/google-api-python-client/
       CompatibleRuntimes:
-        - python3.11
+        - python3.12
     Metadata:
-      BuildMethod: python3.11
+      BuildMethod: python3.12
 
   RequestsLayer:
     Type: AWS::Serverless::LayerVersion
@@ -62,9 +62,9 @@ Resources:
       LayerName: requests
       ContentUri: layer/requests/
       CompatibleRuntimes:
-        - python3.11
+        - python3.12
     Metadata:
-      BuildMethod: python3.11
+      BuildMethod: python3.12
 
   AddGcalEventFunction:
     Type: AWS::Serverless::Function
@@ -72,7 +72,7 @@ Resources:
       CodeUri: function/add-gcal-event/
       Description: "add valorant match to google calendar as a event"
       Handler: index.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.12
       Architectures:
         - x86_64
       MemorySize: 128
@@ -115,7 +115,7 @@ Resources:
       CodeUri: function/get-match-list/
       Description: "invoke fetch-daily-matches function via SQS queue publishing"
       Handler: index.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.12
       Architectures:
         - x86_64
       MemorySize: 128
@@ -145,7 +145,7 @@ Resources:
       CodeUri: function/fetch-daily-matches/
       Description: "fetch daily valorant matches"
       Handler: index.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.12
       Architectures:
         - x86_64
       MemorySize: 128
