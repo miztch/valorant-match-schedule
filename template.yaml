@@ -47,8 +47,11 @@ Resources:
       ContentUri: layer/google-auth/
       CompatibleRuntimes:
         - python3.12
+      CompatibleArchitectures:
+        - x86_64
     Metadata:
       BuildMethod: python3.12
+      BuildArchitecture: x86_64
 
   GoogleApiPythonClientLayer:
     Type: AWS::Serverless::LayerVersion
@@ -57,8 +60,11 @@ Resources:
       ContentUri: layer/google-api-python-client/
       CompatibleRuntimes:
         - python3.12
+      CompatibleArchitectures:
+        - x86_64
     Metadata:
       BuildMethod: python3.12
+      BuildArchitecture: x86_64
 
   RequestsLayer:
     Type: AWS::Serverless::LayerVersion
@@ -67,8 +73,11 @@ Resources:
       ContentUri: layer/requests/
       CompatibleRuntimes:
         - python3.12
+      CompatibleArchitectures:
+        - x86_64
     Metadata:
       BuildMethod: python3.12
+      BuildArchitecture: x86_64
 
   AddGcalEventFunction:
     Type: AWS::Serverless::Function
