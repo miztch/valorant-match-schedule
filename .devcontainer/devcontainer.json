@@ -13,7 +13,8 @@
                 "github.vscode-github-actions",
                 "ms-python.black-formatter",
                 "ms-python.isort",
-                "kddejong.vscode-cfn-lint"
+                "kddejong.vscode-cfn-lint",
+                "oderwat.indent-rainbow"
             ],
             "settings": {
                 "terminal.integrated.shell.linux": "/usr/bin/zsh",
