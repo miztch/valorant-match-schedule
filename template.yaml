@@ -1,8 +1,12 @@
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Transform: "AWS::Serverless-2016-10-31"
 Description: valorant-match-schedule
 
 Parameters:
+  ApplicationName:
+    Description: resource prefix
+    Type: String
+    Default: valorant-match-schedule
   APIEndpointDomainName:
     Description: Domain name of API endpoint URL of dima (matches API)
     Type: String
@@ -39,40 +43,50 @@ Resources:
   GoogleAuthLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: google-auth
+      LayerName: !Sub ${ApplicationName}-google-auth
       ContentUri: layer/google-auth/
       CompatibleRuntimes:
-        - python3.11
+        - python3.12
+      CompatibleArchitectures:
+        - x86_64
     Metadata:
-      BuildMethod: python3.11
+      BuildMethod: python3.12
+      BuildArchitecture: x86_64
 
   GoogleApiPythonClientLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: google-api-python-client
+      LayerName: !Sub ${ApplicationName}-google-api-python-client
       ContentUri: layer/google-api-python-client/
       CompatibleRuntimes:
-        - python3.11
+        - python3.12
+      CompatibleArchitectures:
+        - x86_64
     Metadata:
-      BuildMethod: python3.11
+      BuildMethod: python3.12
+      BuildArchitecture: x86_64
 
   RequestsLayer:
     Type: AWS::Serverless::LayerVersion
     Properties:
-      LayerName: requests
+      LayerName: !Sub ${ApplicationName}-requests
       ContentUri: layer/requests/
       CompatibleRuntimes:
-        - python3.11
+        - python3.12
+      CompatibleArchitectures:
+        - x86_64
     Metadata:
-      BuildMethod: python3.11
+      BuildMethod: python3.12
+      BuildArchitecture: x86_64
 
   AddGcalEventFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub ${ApplicationName}-add-gcal-event
       CodeUri: function/add-gcal-event/
       Description: "add valorant match to google calendar as a event"
       Handler: index.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.12
       Architectures:
         - x86_64
       MemorySize: 128
@@ -112,10 +126,11 @@ Resources:
   GetMatchListFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub ${ApplicationName}-get-match-list
       CodeUri: function/get-match-list/
       Description: "invoke fetch-daily-matches function via SQS queue publishing"
       Handler: index.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.12
       Architectures:
         - x86_64
       MemorySize: 128
@@ -142,10 +157,11 @@ Resources:
   FetchDailyMatchesFunction:
     Type: AWS::Serverless::Function
     Properties:
+      FunctionName: !Sub ${ApplicationName}-fetch-daily-matches
       CodeUri: function/fetch-daily-matches/
       Description: "fetch daily valorant matches"
       Handler: index.lambda_handler
-      Runtime: python3.11
+      Runtime: python3.12
       Architectures:
         - x86_64
       MemorySize: 128
@@ -176,22 +192,25 @@ Resources:
   FetchDailyMatchesQueue:
     Type: AWS::SQS::Queue
     Properties:
+      QueueName: !Sub ${ApplicationName}-fetch-daily-matches-queue
       DelaySeconds: 10
       VisibilityTimeout: 1000
 
   MatchListTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
-    Properties: 
-      AttributeDefinitions: 
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub ${ApplicationName}-fetched
+      AttributeDefinitions:
         - AttributeName: match_id
           AttributeType: N
       BillingMode: PROVISIONED
       DeletionProtectionEnabled: True
-      KeySchema: 
+      KeySchema:
         - AttributeName: match_id
           KeyType: HASH
-      ProvisionedThroughput: 
+      ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
       StreamSpecification:
@@ -203,20 +222,22 @@ Resources:
   OutboxTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
-    Properties: 
-      AttributeDefinitions: 
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub ${ApplicationName}-published
+      AttributeDefinitions:
         - AttributeName: match_id
           AttributeType: N
         - AttributeName: calendar_id
           AttributeType: S
       BillingMode: PROVISIONED
       DeletionProtectionEnabled: True
-      KeySchema: 
+      KeySchema:
         - AttributeName: match_id
           KeyType: HASH
         - AttributeName: calendar_id
           KeyType: RANGE
-      ProvisionedThroughput: 
+      ProvisionedThroughput:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
       TimeToLiveSpecification:
