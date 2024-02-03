@@ -199,6 +199,7 @@ Resources:
   MatchListTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub ${ApplicationName}-fetched
       AttributeDefinitions:
@@ -221,6 +222,7 @@ Resources:
   OutboxTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       TableName: !Sub ${ApplicationName}-published
       AttributeDefinitions:
