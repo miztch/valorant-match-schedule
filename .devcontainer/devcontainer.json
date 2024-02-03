@@ -1,0 +1,38 @@
+{
+    "name": "Python 3",
+    "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bullseye",
+    "features": {
+        "ghcr.io/devcontainers/features/aws-cli:1": {},
+        "ghcr.io/customink/codespaces-features/sam-cli:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "amazonwebservices.aws-toolkit-vscode",
+                "esbenp.prettier-vscode",
+                "github.vscode-github-actions",
+                "ms-python.black-formatter",
+                "ms-python.isort",
+                "kddejong.vscode-cfn-lint"
+            ],
+            "settings": {
+                "terminal.integrated.shell.linux": "/usr/bin/zsh",
+                "[yaml]": {
+                    "editor.defaultFormatter": "esbenp.prettier-vscode"
+                },
+                "[python]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "ms-python.black-formatter"
+                },
+                "isort.args": [
+                    "--profile",
+                    "black"
+                ]
+            }
+        }
+    },
+    "mounts": [
+        "source=${env:HOME}${env:USERPROFILE}/.aws,target=/home/vscode/.aws,type=bind,consistency=cached"
+    ],
+    "postCreateCommand": "pip install cfn-lint"
+}
