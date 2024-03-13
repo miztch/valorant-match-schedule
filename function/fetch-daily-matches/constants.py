@@ -123,6 +123,15 @@ international_events = [
     "Champions Tour 2024: EMEA Kickoff",
     "Champions Tour 2024: China Kickoff",
     "Champions Tour 2024: Masters Madrid",
+    "Champions Tour 2024: Americas Stage 1",
+    "Champions Tour 2024: EMEA Stage 1",
+    "Champions Tour 2024: Pacific Stage 1",
+    "Champions Tour 2024: China Stage 1",
+    "Champions Tour 2024: Masters Shanghai",
+    "Champions Tour 2024: Americas Stage 2",
+    "Champions Tour 2024: EMEA Stage 2",
+    "Champions Tour 2024: Pacific Stage 2",
+    "Champions Tour 2024: China Stage 2",
 ]
 
 abbrs = {
