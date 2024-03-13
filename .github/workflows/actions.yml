@@ -25,6 +25,8 @@ jobs:
         uses: actions/setup-python@v5
       - name: Setup AWS SAM CLI
         uses: aws-actions/setup-sam@v2
+        with:
+          use-installer: true
       - name: Setup AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
@@ -63,7 +65,7 @@ jobs:
           }
           EOF
       - name: Build SAM packages
-        run: sam build --use-container
+        run: sam build --use-container --parallel
       - name: Deploy SAM application
         env:
           BUCKET_NAME: ${{ secrets.PROVISIONING_BUCKET_NAME }}
