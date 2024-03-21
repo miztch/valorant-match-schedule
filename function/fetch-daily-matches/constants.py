@@ -39,6 +39,7 @@ countries = {
     "ma": "EMEA",
     "me": "EMEA",
     "mk": "EMEA",
+    "mn": "EAST_ASIA",
     "my": "APAC",
     "mx": "BR_LATAM",
     "no": "EMEA",
