@@ -27,7 +27,9 @@ def get_gcal_credentials():
         "./service_account_key.json", scopes
     )[0]
 
-    service = googleapiclient.discovery.build("calendar", "v3", credentials=credentials)
+    service = googleapiclient.discovery.build(
+        "calendar", "v3", credentials=credentials, cache_discovery=False
+    )
 
     return service
 
