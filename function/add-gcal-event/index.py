@@ -41,6 +41,18 @@ def map_region_to_calendar(region):
     return calendar_id
 
 
+def map_calendar_to_region(calendar_id):
+    """
+    returns region for the calendar
+    """
+
+    for key, value in os.environ.items():
+        if key.startswith("CALENDAR_ID_") and value == calendar_id:
+            return key.replace("CALENDAR_ID_", "")
+
+    return None
+
+
 def deserialize(image):
     """
     DynamoDB-formatted JSON -> Python dict
@@ -71,6 +83,31 @@ def put_event_id(match_id, calendar_id, event_id, matchlist_ttl):
             "ttl": outbox_ttl,
         }
     )
+
+
+def delete_event_id(match_id, calendar_id):
+    """
+    delete item from outbox DynamoDB Table
+    """
+
+    table.delete_item(Key={"match_id": match_id, "calendar_id": calendar_id})
+
+    return None
+
+
+def get_registered_calendars(match_id):
+    """
+    get calendars that the event is registered in
+    """
+    try:
+        response = table.query(
+            KeyConditionExpression=Key("match_id").eq(match_id),
+        )
+        calendars = [item["calendar_id"] for item in response["Items"]]
+    except Exception as e:
+        raise e
+    else:
+        return calendars
 
 
 def if_gcal_event_registered(match_id, calendar_id):
@@ -168,6 +205,24 @@ def update_gcal_event(service_account_id, calendar_id, item, event_id):
     return result
 
 
+def delete_gcal_event(service_account_id, calendar_id, item, event_id):
+    """
+    delete existing Google Calendar event
+    """
+    service = get_gcal_credentials()
+
+    try:
+        logger.info("delete existing event: %s", event_id)
+        result = (
+            service.events().delete(calendarId=calendar_id, eventId=event_id).execute()
+        )
+        delete_event_id(item["match_id"], calendar_id)
+    except Exception as e:
+        raise e
+
+    return None
+
+
 def lambda_handler(event, context):
     records = event["Records"]
     logger.info(records)
@@ -175,17 +230,43 @@ def lambda_handler(event, context):
     for record in records:
         # progress if not 'REMOVE' action
         # (do nothing when that)
-        if record["eventName"] != "REMOVE":
-            # DynamoDB JSON -> Python dict
-            image = record["dynamodb"]["NewImage"]
-            item = deserialize(image)
+        if record["eventName"] == "REMOVE":
+            logger.info("no action for REMOVE event")
+            return
 
-            # item['region'] can be like "EMEA" or "EMEA#INTERNATIONAL"
-            # if international event, add event to two calendars
-            regions = item["region"].split("#")
-            for region in regions:
+        # DynamoDB JSON -> Python dict
+        image = record["dynamodb"]["NewImage"]
+        item = deserialize(image)
+
+        # first, remove unnecessary calendar events. defined by "regions" for a match.
+        # check which calendar the event is registered in. returns a list of calendars
+        registered_calendars = get_registered_calendars(item["match_id"])
+        # get registered regions from given calendar_ids
+        registered_regions = [
+            map_calendar_to_region(calendar)
+            for calendar in registered_calendars
+            if map_calendar_to_region(calendar) is not None
+        ]
+        logger.info(
+            "match_id: %s is registered in calendar(s): %s",
+            item["match_id"],
+            registered_regions,
+        )
+
+        # item['region'] can be like "EMEA" or "EMEA#INTERNATIONAL"
+        # if international event, add event to two calendars
+        regions = item["region"].split("#")
+        logger.info(
+            "match_id: %s is for calendar(s): %s",
+            item["match_id"],
+            regions,
+        )
+
+        # if the event is registered at least in 1 calendar, pass to the next step
+        # registered but not in given regions, remove it
+        for region in registered_regions:
+            if region not in regions:
                 calendar_id = map_region_to_calendar(region)
-
                 try:
                     # Outbox DynamoDB Table has record = already registered
                     already_registered, event_id = if_gcal_event_registered(
@@ -193,11 +274,27 @@ def lambda_handler(event, context):
                     )
 
                     if already_registered:
-                        update_gcal_event(
+                        delete_gcal_event(
                             service_account_id, calendar_id, item, event_id
                         )
-                    else:
-                        add_gcal_event(service_account_id, calendar_id, item)
-
                 except Exception as e:
                     raise e
+
+        # second, add or update calendar events.
+        for region in regions:
+            calendar_id = map_region_to_calendar(region)
+            try:
+                # Outbox DynamoDB Table has record = already registered
+                already_registered, event_id = if_gcal_event_registered(
+                    item["match_id"], calendar_id
+                )
+
+                if already_registered:
+                    # if the event is registered in a calendar, update it
+                    update_gcal_event(service_account_id, calendar_id, item, event_id)
+                else:
+                    # if the event is not registered in a calendar, add it
+                    add_gcal_event(service_account_id, calendar_id, item)
+
+            except Exception as e:
+                raise e
