@@ -37,16 +37,7 @@ def map_region_to_calendar(region):
     returns calendar_id for the event
     """
 
-    calendars = {
-        "APAC": os.environ["CALENDAR_ID_APAC"],
-        "BR_LATAM": os.environ["CALENDAR_ID_BR_LATAM"],
-        "EAST_ASIA": os.environ["CALENDAR_ID_EAST_ASIA"],
-        "EMEA": os.environ["CALENDAR_ID_EMEA"],
-        "NA": os.environ["CALENDAR_ID_NA"],
-        "INTERNATIONAL": os.environ["CALENDAR_ID_INTERNATIONAL"],
-    }
-
-    calendar_id = calendars[region]
+    calendar_id = os.environ[f"CALENDAR_ID_{region}"]
     return calendar_id
 
 
