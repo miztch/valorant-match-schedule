@@ -110,30 +110,27 @@ def get_registered_calendars(match_id):
         return calendars
 
 
-def if_gcal_event_registered(match_id, calendar_id):
+def get_gcal_event_id(match_id, calendar_id):
     """
-    two functions
-      - check if the Google Calendar event is already registered
-        - outbox DynamoDB table has its status as an item
-      - get event_id of Google Calendar from match_id in outbox DynamoDB Table
+    get event_id of Google Calendar from match_id in outbox DynamoDB Table
     """
 
     record = table.get_item(Key={"match_id": match_id, "calendar_id": calendar_id})
 
     if "Item" in record:
         logger.info(
-            "match id: %s found to already be registered in calendar id: %s",
+            "match id: %s found in calendar id: %s",
             match_id,
             calendar_id,
         )
-        return True, record["Item"]["event_id"]
+        return record["Item"]["event_id"]
     else:
         logger.info(
-            "match id: %s was not found to be registered in calendar id: %s yet",
+            "match id: %s not found in calendar id: %s yet",
             match_id,
             calendar_id,
         )
-        return False, ""
+        return ""
 
 
 def assemble_gcal_event_json(action, item):
@@ -266,11 +263,9 @@ def lambda_handler(event, context):
                 calendar_id = map_region_to_calendar(region)
                 try:
                     # Outbox DynamoDB Table has record = already registered
-                    already_registered, event_id = if_gcal_event_registered(
-                        item["match_id"], calendar_id
-                    )
+                    event_id = get_gcal_event_id(item["match_id"], calendar_id)
 
-                    if already_registered:
+                    if event_id:
                         delete_gcal_event(service, calendar_id, item, event_id)
                 except Exception as e:
                     raise e
@@ -279,16 +274,11 @@ def lambda_handler(event, context):
         for region in regions:
             calendar_id = map_region_to_calendar(region)
             try:
-                # Outbox DynamoDB Table has record = already registered
-                already_registered, event_id = if_gcal_event_registered(
-                    item["match_id"], calendar_id
-                )
+                event_id = get_gcal_event_id(item["match_id"], calendar_id)
 
-                if already_registered:
-                    # if the event is registered in a calendar, update it
+                if event_id:
                     update_gcal_event(service, calendar_id, item, event_id)
                 else:
-                    # if the event is not registered in a calendar, add it
                     add_gcal_event(service, calendar_id, item)
 
             except Exception as e:
