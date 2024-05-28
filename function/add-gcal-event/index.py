@@ -167,12 +167,10 @@ def assemble_gcal_event_json(action, item):
         return detail
 
 
-def add_gcal_event(service_account_id, calendar_id, item):
+def add_gcal_event(service, calendar_id, item):
     """
     add new Google Calendar event
     """
-    service = get_gcal_credentials()
-
     body = assemble_gcal_event_json("ADD", item)
 
     try:
@@ -185,12 +183,10 @@ def add_gcal_event(service_account_id, calendar_id, item):
     return result
 
 
-def update_gcal_event(service_account_id, calendar_id, item, event_id):
+def update_gcal_event(service, calendar_id, item, event_id):
     """
     update existing Google Calendar event
     """
-    service = get_gcal_credentials()
-
     body = assemble_gcal_event_json("UPDATE", item)
 
     try:
@@ -207,11 +203,10 @@ def update_gcal_event(service_account_id, calendar_id, item, event_id):
     return result
 
 
-def delete_gcal_event(service_account_id, calendar_id, item, event_id):
+def delete_gcal_event(service, calendar_id, item, event_id):
     """
     delete existing Google Calendar event
     """
-    service = get_gcal_credentials()
 
     try:
         logger.info("delete existing event: %s", event_id)
@@ -228,6 +223,8 @@ def delete_gcal_event(service_account_id, calendar_id, item, event_id):
 def lambda_handler(event, context):
     records = event["Records"]
     logger.info(records)
+
+    service = get_gcal_credentials()
 
     for record in records:
         # progress if not 'REMOVE' action
@@ -276,9 +273,7 @@ def lambda_handler(event, context):
                     )
 
                     if already_registered:
-                        delete_gcal_event(
-                            service_account_id, calendar_id, item, event_id
-                        )
+                        delete_gcal_event(service, calendar_id, item, event_id)
                 except Exception as e:
                     raise e
 
@@ -293,10 +288,10 @@ def lambda_handler(event, context):
 
                 if already_registered:
                     # if the event is registered in a calendar, update it
-                    update_gcal_event(service_account_id, calendar_id, item, event_id)
+                    update_gcal_event(service, calendar_id, item, event_id)
                 else:
                     # if the event is not registered in a calendar, add it
-                    add_gcal_event(service_account_id, calendar_id, item)
+                    add_gcal_event(service, calendar_id, item)
 
             except Exception as e:
                 raise e
