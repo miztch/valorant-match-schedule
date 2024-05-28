@@ -12,8 +12,6 @@ from boto3.dynamodb.types import TypeDeserializer
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-service_account_id = os.environ["GOOGLE_SERVICE_ACCOUNT_ID"]
-
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["OUTBOX_TABLE"])
 
