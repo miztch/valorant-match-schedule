@@ -15,8 +15,6 @@ logger.setLevel(logging.INFO)
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["OUTBOX_TABLE"])
 
-deserializer = TypeDeserializer()
-
 
 def get_gcal_credentials():
     scopes = ["https://www.googleapis.com/auth/calendar"]
@@ -57,6 +55,8 @@ def deserialize(image):
     """
     DynamoDB-formatted JSON -> Python dict
     """
+    deserializer = TypeDeserializer()
+
     d = {}
     for key in image:
         d[key] = deserializer.deserialize(image[key])
