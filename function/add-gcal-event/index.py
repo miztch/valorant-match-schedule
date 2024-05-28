@@ -133,16 +133,24 @@ def get_gcal_event_id(match_id, calendar_id):
         return ""
 
 
-def assemble_gcal_event_json(action, item):
+def generate_event_id(match_id):
+    """
+    generate event_id for Google Calendar
+    """
+    # format: "match" + match_id + "0" + hash value
+    # this length has no decent reason
+    hash_length = 16 - len(str(match_id))
+    random_string = str(random.randrange(10**hash_length, 10 ** (hash_length + 1)))
+
+    event_id = f"match{match_id}0{random_string}"
+
+    return event_id
+
+
+def assemble_gcal_event_detail(item):
     """
     assemble json for creating / updating Google Calendar event
     """
-    # event_id is needed only for "ADD" action
-    # format: "match" + match_id + "0" + hash value
-    # this length has no decent reason
-    hash_length = 16 - len(str(item["match_id"]))
-    random_string = str(random.randrange(10**hash_length, 10 ** (hash_length + 1)))
-    event_id = {"id": f"match{item['match_id']}0{random_string}"}
     detail = {
         "summary": f"{item['team_home']} - {item['team_away']} | { item['event_name']} - {item['event_detail']}",
         "description": item["match_uri"],
@@ -156,22 +164,22 @@ def assemble_gcal_event_json(action, item):
         },
     }
 
-    if action == "ADD":
-        return dict(**event_id, **detail)
-    else:
-        return detail
+    return detail
 
 
 def add_gcal_event(service, calendar_id, item):
     """
     add new Google Calendar event
     """
-    body = assemble_gcal_event_json("ADD", item)
+    body = assemble_gcal_event_detail(item)
+
+    event_id = generate_event_id(item["match_id"])
+    body["id"] = event_id
 
     try:
         logger.info("insert new event: %s", body)
         result = service.events().insert(calendarId=calendar_id, body=body).execute()
-        put_event_id(item["match_id"], calendar_id, body["id"], item["ttl"])
+        put_event_id(item["match_id"], calendar_id, event_id, item["ttl"])
     except Exception as e:
         raise e
 
@@ -182,7 +190,7 @@ def update_gcal_event(service, calendar_id, item, event_id):
     """
     update existing Google Calendar event
     """
-    body = assemble_gcal_event_json("UPDATE", item)
+    body = assemble_gcal_event_detail(item)
 
     try:
         logger.info("update existing event: %s", body)
