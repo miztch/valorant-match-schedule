@@ -116,17 +116,19 @@ def get_gcal_event_id(match_id, calendar_id):
     """
 
     record = table.get_item(Key={"match_id": match_id, "calendar_id": calendar_id})
+    region = map_calendar_to_region(calendar_id)
 
     if "Item" in record:
         logger.info(
-            "match id: %s found in calendar id: %s",
+            "match id: %s found in calendar for %s (id: %s)",
             match_id,
+            region,
             calendar_id,
         )
         return record["Item"]["event_id"]
     else:
         logger.info(
-            "match id: %s not found in calendar id: %s yet",
+            "match id: %s not found in calendar for %s (id: %s)",
             match_id,
             calendar_id,
         )
