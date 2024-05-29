@@ -130,6 +130,7 @@ def get_gcal_event_id(match_id, calendar_id):
         logger.info(
             "match id: %s not found in calendar for %s (id: %s)",
             match_id,
+            region,
             calendar_id,
         )
         return ""
