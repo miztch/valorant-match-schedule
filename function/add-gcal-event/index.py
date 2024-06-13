@@ -234,10 +234,10 @@ def lambda_handler(event, context):
 
     for record in records:
         # progress if not 'REMOVE' action
-        # (do nothing when that)
+        # (do nothing when that and continue to the next record)
         if record["eventName"] == "REMOVE":
             logger.info("no action for REMOVE event")
-            return
+            continue
 
         # DynamoDB JSON -> Python dict
         image = record["dynamodb"]["NewImage"]
