@@ -120,7 +120,7 @@ def get_gcal_event_id(match_id, calendar_id):
 
     if "Item" in record:
         logger.info(
-            "match id: %s found in calendar for %s (id: %s)",
+            "match id: %s found in calendar (region: %s, id: %s)",
             match_id,
             region,
             calendar_id,
@@ -128,7 +128,7 @@ def get_gcal_event_id(match_id, calendar_id):
         return record["Item"]["event_id"]
     else:
         logger.info(
-            "match id: %s not found in calendar for %s (id: %s)",
+            "match id: %s not found in calendar (region: %s, id: %s)",
             match_id,
             region,
             calendar_id,
