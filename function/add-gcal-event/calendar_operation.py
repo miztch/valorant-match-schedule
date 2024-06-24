@@ -1,5 +1,4 @@
 import logging
-import os
 
 from id_generators import generate_event_id
 from region import (

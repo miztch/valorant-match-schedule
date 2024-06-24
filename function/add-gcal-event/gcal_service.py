@@ -1,12 +1,7 @@
-import logging
 import os
 
 import google.auth
 import googleapiclient.discovery
-
-
-logger = logging.getLogger()
-logger.setLevel(logging.INFO)
 
 
 def get_gcal_credentials():

@@ -1,6 +1,4 @@
-import json
 import logging
-import os
 
 from calendar_operation import update_match_on_calendars
 
