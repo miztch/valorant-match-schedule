@@ -110,6 +110,35 @@ def get_registered_calendars(match_id):
         return calendars
 
 
+def get_registered_regions(item):
+    registered_calendars = get_registered_calendars(item["match_id"])
+    registered_regions = [
+        map_calendar_to_region(calendar)
+        for calendar in registered_calendars
+        if map_calendar_to_region(calendar) is not None
+    ]
+    logger.info(
+        "match_id: %s is in calendar(s): %s",
+        item["match_id"],
+        registered_regions,
+    )
+
+    return registered_regions
+
+
+def get_regions_to_register(item):
+    # item['region'] can be like "EMEA" or "EMEA#INTERNATIONAL"
+    # if international event, add event to two calendars
+    regions = item["region"].split("#")
+    logger.info(
+        "match_id: %s is for calendar(s): %s",
+        item["match_id"],
+        regions,
+    )
+
+    return regions
+
+
 def get_gcal_event_id(match_id, calendar_id):
     """
     get event_id of Google Calendar from match_id in outbox DynamoDB Table
@@ -226,6 +255,54 @@ def delete_gcal_event(service, calendar_id, item, event_id):
     return None
 
 
+def delete_event(service, item, regions, registered_regions):
+    # if the event is registered at least in 1 calendar, pass to the next step
+    # registered but not in given regions, remove it
+    for region in registered_regions:
+        if region not in regions:
+            calendar_id = map_region_to_calendar(region)
+            try:
+                # Outbox DynamoDB Table has record = already registered
+                event_id = get_gcal_event_id(item["match_id"], calendar_id)
+
+                if event_id:
+                    delete_gcal_event(service, calendar_id, item, event_id)
+            except Exception as e:
+                raise e
+
+
+def populate_event(service, item, regions):
+    # second, add or update calendar events.
+    for region in regions:
+        calendar_id = map_region_to_calendar(region)
+        try:
+            event_id = get_gcal_event_id(item["match_id"], calendar_id)
+
+            if event_id:
+                update_gcal_event(service, calendar_id, item, event_id)
+            else:
+                add_gcal_event(service, calendar_id, item)
+
+        except Exception as e:
+            raise e
+
+
+def process_record(service, record):
+    # DynamoDB JSON -> Python dict
+    image = record["dynamodb"]["NewImage"]
+    item = deserialize(image)
+
+    # first, remove unnecessary calendar events. defined by "regions" for a match.
+    # get registered regions for the match
+    registered_regions = get_registered_regions(item)
+
+    # get regions to register by item.region
+    regions_to_register = get_regions_to_register(item)
+
+    delete_event(service, item, regions_to_register, registered_regions)
+    populate_event(service, item, regions_to_register)
+
+
 def lambda_handler(event, context):
     records = event["Records"]
     logger.info(records)
@@ -239,58 +316,4 @@ def lambda_handler(event, context):
             logger.info("no action for REMOVE event")
             continue
 
-        # DynamoDB JSON -> Python dict
-        image = record["dynamodb"]["NewImage"]
-        item = deserialize(image)
-
-        # first, remove unnecessary calendar events. defined by "regions" for a match.
-        # check which calendar the event is registered in. returns a list of calendars
-        registered_calendars = get_registered_calendars(item["match_id"])
-        # get registered regions from given calendar_ids
-        registered_regions = [
-            map_calendar_to_region(calendar)
-            for calendar in registered_calendars
-            if map_calendar_to_region(calendar) is not None
-        ]
-        logger.info(
-            "match_id: %s is registered in calendar(s): %s",
-            item["match_id"],
-            registered_regions,
-        )
-
-        # item['region'] can be like "EMEA" or "EMEA#INTERNATIONAL"
-        # if international event, add event to two calendars
-        regions = item["region"].split("#")
-        logger.info(
-            "match_id: %s is for calendar(s): %s",
-            item["match_id"],
-            regions,
-        )
-
-        # if the event is registered at least in 1 calendar, pass to the next step
-        # registered but not in given regions, remove it
-        for region in registered_regions:
-            if region not in regions:
-                calendar_id = map_region_to_calendar(region)
-                try:
-                    # Outbox DynamoDB Table has record = already registered
-                    event_id = get_gcal_event_id(item["match_id"], calendar_id)
-
-                    if event_id:
-                        delete_gcal_event(service, calendar_id, item, event_id)
-                except Exception as e:
-                    raise e
-
-        # second, add or update calendar events.
-        for region in regions:
-            calendar_id = map_region_to_calendar(region)
-            try:
-                event_id = get_gcal_event_id(item["match_id"], calendar_id)
-
-                if event_id:
-                    update_gcal_event(service, calendar_id, item, event_id)
-                else:
-                    add_gcal_event(service, calendar_id, item)
-
-            except Exception as e:
-                raise e
+        process_record(service, record)
