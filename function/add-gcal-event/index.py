@@ -17,6 +17,9 @@ table = dynamodb.Table(os.environ["OUTBOX_TABLE"])
 
 
 def get_gcal_credentials():
+    """
+    get Google Calendar credentials
+    """
     scopes = ["https://www.googleapis.com/auth/calendar"]
 
     credentials = google.auth.load_credentials_from_file(
@@ -111,6 +114,9 @@ def get_registered_calendars(match_id):
 
 
 def get_registered_regions(item):
+    """
+    get region names of calendars that the event is registered in
+    """
     registered_calendars = get_registered_calendars(item["match_id"])
     registered_regions = [
         map_calendar_to_region(calendar)
@@ -127,6 +133,9 @@ def get_registered_regions(item):
 
 
 def get_regions_to_register(item):
+    """
+    get region names to register the event
+    """
     # item['region'] can be like "EMEA" or "EMEA#INTERNATIONAL"
     # if international event, add event to two calendars
     regions = item["region"].split("#")
@@ -209,7 +218,11 @@ def add_gcal_event(service, calendar_id, item):
     body["id"] = event_id
 
     try:
-        logger.info("insert new event: %s", body)
+        logger.info(
+            "insert new event into calendar %s: %s",
+            map_calendar_to_region(calendar_id),
+            body,
+        )
         result = service.events().insert(calendarId=calendar_id, body=body).execute()
         put_event_id(item["match_id"], calendar_id, event_id, item["ttl"])
     except Exception as e:
@@ -256,6 +269,9 @@ def delete_gcal_event(service, calendar_id, item, event_id):
 
 
 def delete_event(service, item, regions, registered_regions):
+    """
+    delete unnecessary calendar events
+    """
     # if the event is registered at least in 1 calendar, pass to the next step
     # registered but not in given regions, remove it
     for region in registered_regions:
@@ -272,6 +288,9 @@ def delete_event(service, item, regions, registered_regions):
 
 
 def populate_event(service, item, regions):
+    """
+    add or update calendar events
+    """
     # second, add or update calendar events.
     for region in regions:
         calendar_id = map_region_to_calendar(region)
@@ -287,7 +306,10 @@ def populate_event(service, item, regions):
             raise e
 
 
-def process_record(service, record):
+def update_match_on_calendars(service, record):
+    """
+    update Google Calendar with adding/updating/removing the given match record
+    """
     # DynamoDB JSON -> Python dict
     image = record["dynamodb"]["NewImage"]
     item = deserialize(image)
@@ -316,4 +338,4 @@ def lambda_handler(event, context):
             logger.info("no action for REMOVE event")
             continue
 
-        process_record(service, record)
+        update_match_on_calendars(service, record)
