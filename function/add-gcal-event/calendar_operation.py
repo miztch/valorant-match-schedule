@@ -25,11 +25,11 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def assemble_gcal_event_detail(item):
+def generate_event_body(item):
     """
     assemble json for creating / updating Google Calendar event
     """
-    detail = {
+    event_body = {
         "summary": f"{item['team_home']} - {item['team_away']} | { item['event_name']} - {item['event_detail']}",
         "description": item["match_uri"],
         "start": {
@@ -42,7 +42,7 @@ def assemble_gcal_event_detail(item):
         },
     }
 
-    return detail
+    return event_body
 
 
 def populate_event(service, item, regions):
@@ -52,7 +52,7 @@ def populate_event(service, item, regions):
     for region in regions:
         calendar_id = map_region_to_calendar(region)
 
-        body = assemble_gcal_event_detail(item)
+        body = generate_event_body(item)
         event_id = get_gcal_event_id(item["match_id"], calendar_id)
 
         if event_id:
