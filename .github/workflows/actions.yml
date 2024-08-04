@@ -44,24 +44,30 @@ jobs:
           APPLICATION_NAME: "valorant-match-schedule"
           API_ENDPOINT_DOMAIN_NAME: ${{ secrets.API_ENDPOINT_DOMAIN_NAME }}
           GOOGLE_SERVICE_ACCOUNT_ID: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_ID }}
+          GCAL_ID_AMERICAS: ${{ vars.GCAL_ID_AMERICAS }}
+          GCAL_ID_CHINA: ${{ vars.GCAL_ID_CHINA }}
+          GCAL_ID_EMEA: ${{ vars.GCAL_ID_EMEA }}
+          GCAL_ID_PACIFIC: ${{ vars.GCAL_ID_PACIFIC }}
+          GCAL_ID_INTERNATIONAL: ${{ vars.GCAL_ID_INTERNATIONAL }}
           GCAL_ID_APAC: ${{ vars.GCAL_ID_APAC }}
           GCAL_ID_BR_LATAM: ${{ vars.GCAL_ID_BR_LATAM }}
           GCAL_ID_EAST_ASIA: ${{ vars.GCAL_ID_EAST_ASIA }}
-          GCAL_ID_EMEA: ${{ vars.GCAL_ID_EMEA }}
           GCAL_ID_NA: ${{ vars.GCAL_ID_NA }}
-          GCAL_ID_INTERNATIONAL: ${{ vars.GCAL_ID_INTERNATIONAL }}
         run: |
           tee params.json << EOF
           { 
             "ApplicationName": "${APPLICATION_NAME}",
             "APIEndpointDomainName": "${API_ENDPOINT_DOMAIN_NAME}",
             "GoogleServiceAccountId": "${GOOGLE_SERVICE_ACCOUNT_ID}",
+            "CalendarIdAmericas": "${GCAL_ID_AMERICAS}",
+            "CalendarIdChina": "${GCAL_ID_CHINA}",
+            "CalendarIdEmea": "${GCAL_ID_EMEA}",
+            "CalendarIdPacific": "${GCAL_ID_PACIFIC}",
+            "CalendarIdInternational": "${GCAL_ID_INTERNATIONAL}",
             "CalendarIdApac": "${GCAL_ID_APAC}",
             "CalendarIdBrLatam": "${GCAL_ID_BR_LATAM}",
             "CalendarIdEastAsia": "${GCAL_ID_EAST_ASIA}",
-            "CalendarIdEmea": "${GCAL_ID_EMEA}",
-            "CalendarIdNa": "${GCAL_ID_NA}",
-            "CalendarIdInternational": "${GCAL_ID_INTERNATIONAL}"
+            "CalendarIdNa": "${GCAL_ID_NA}"
           }
           EOF
       - name: Build SAM packages

@@ -14,17 +14,23 @@ Parameters:
     ConstraintDescription: should be appropriate domain format
   GoogleServiceAccountId:
     Type: String
+  CalendarIdAmericas:
+    Type: String
+  CalendarIdChina:
+    Type: String
+  CalendarIdEmea:
+    Type: String
+  CalendarIdPacific:
+    Type: String
+  CalendarIdInternational:
+    Type: String
   CalendarIdApac:
     Type: String
   CalendarIdBrLatam:
     Type: String
   CalendarIdEastAsia:
     Type: String
-  CalendarIdEmea:
-    Type: String
   CalendarIdNa:
-    Type: String
-  CalendarIdInternational:
     Type: String
   ScheduleExpression:
     Description: schedule expression for the eventbridge event
@@ -98,12 +104,15 @@ Resources:
         Variables:
           OUTBOX_TABLE: !Ref OutboxTable
           GOOGLE_SERVICE_ACCOUNT_ID: !Ref GoogleServiceAccountId
+          CALENDAR_ID_AMERICAS: !Ref CalendarIdAmericas
+          CALENDAR_ID_CHINA: !Ref CalendarIdChina
+          CALENDAR_ID_EMEA: !Ref CalendarIdEmea
+          CALENDAR_ID_PACIFIC: !Ref CalendarIdPacific
+          CALENDAR_ID_INTERNATIONAL: !Ref CalendarIdInternational
           CALENDAR_ID_APAC: !Ref CalendarIdApac
           CALENDAR_ID_BR_LATAM: !Ref CalendarIdBrLatam
           CALENDAR_ID_EAST_ASIA: !Ref CalendarIdEastAsia
-          CALENDAR_ID_EMEA: !Ref CalendarIdEmea
           CALENDAR_ID_NA: !Ref CalendarIdNa
-          CALENDAR_ID_INTERNATIONAL: !Ref CalendarIdInternational
       Layers:
         - !Ref GoogleAuthLayer
         - !Ref GoogleApiPythonClientLayer

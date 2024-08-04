@@ -1,3 +1,12 @@
+tier1_regions = {
+    "NA": "AMERICAS",
+    "BR_LATAM": "AMERICAS",
+    "APAC": "PACIFIC",
+    "EAST_ASIA": "PACIFIC",
+    "CHINA": "CHINA",
+    "EMEA": "EMEA",
+}
+
 countries = {
     "ar": "BR_LATAM",
     "at": "EMEA",
@@ -9,7 +18,7 @@ countries = {
     "ca": "NA",
     "ch": "EMEA",
     "cl": "BR_LATAM",
-    "cn": "EAST_ASIA",
+    "cn": "CHINA",
     "co": "BR_LATAM",
     "cz": "EMEA",
     "de": "EMEA",
