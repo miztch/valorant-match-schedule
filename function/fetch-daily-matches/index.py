@@ -91,6 +91,20 @@ def map_flag_to_region(flag, region_map, event_name):
     return region
 
 
+def get_tier1_region(region):
+    """
+    get tier1 region name from region name
+    """
+    tier1_region_map = constants.tier1_regions
+    if region in tier1_region_map:
+        tier1_region = tier1_region_map[region]
+    else:
+        logger.warning("region: %s was not mapped to any tier1 region", region)
+        tier1_region = ""
+
+    return tier1_region
+
+
 def fetch_daily_matches(date):
     """
     fetch match information for the specified day from api endpoint
@@ -125,21 +139,34 @@ def fetch_daily_matches(date):
     # pick up information for each individual match
     match_list = []
     for match in matches:
+        regions = set()
+
         # get region from flag indicator
         # skip if empty so that "Calendar Id" for Gcal cannot be determined
         flag = match["eventCountryFlag"]
         event_name = utils.shorten(match["eventName"])
         region = map_flag_to_region(flag, region_map, event_name)
+        if region:
+            regions.add(region)
 
         if not region:
             continue
 
+        # get Tier-1 region name (AMERICS, EMEA, PACIFIC, CHINA)
+        tier1_region = get_tier1_region(region)
+        if tier1_region:
+            regions.add(tier1_region)
+
+        if not tier1_region:
+            continue
+
+        # match id, teams
         match_id = match["id"]
         teams = [team["title"] for team in match["teams"]]
 
-        # if international league match(ex. EMEA,Americas,Pacific)
+        # if international league match
         if event_name in international_events:
-            region += "#INTERNATIONAL"
+            regions.add("INTERNATIONAL")
 
         # day x, upper/lower bracket, etc
         event_detail = utils.shorten(match["matchName"])
@@ -155,7 +182,7 @@ def fetch_daily_matches(date):
         # assemble item as a dictionary
         item = {
             "match_id": match_id,
-            "region": region,
+            "region": "#".join(regions),
             "team_home": teams[0],
             "team_away": teams[1],
             "event_name": event_name,
