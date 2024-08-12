@@ -1,0 +1,39 @@
+baseURL = "https://valorant-calendar.mizt.ch/"
+languageCode = "en"
+defaultContentLanguage = "en"
+
+title = "Valorant Match Schedule"
+copyright = "© 2024 <a class='hover:underline hover:decoration-primary-400 hover:text-primary-500' href='https://x.com/m1ztch'>miztch</a> | <a class='hover:underline hover:decoration-primary-400 hover:text-primary-500' href='https://github.com/miztch/valorant-match-schedule'>GitHub</a>"
+
+enableEmoji = true
+disableKinds = ["taxonomy", "term"]
+
+googleAnalytics = "G-T160DKFZWX"
+
+[author]
+  headline = "Check Valorant competitive match schedule on Google Calendar!"
+
+  links = [
+    { americas = { href = "https://calendar.google.com/calendar/u/0?cid=YmRkZTBmNWZhYTQ2ZTQxZGRmYWJkZTJmYjhlZDZhZTcxOTdiNjQ2MTQyYjhlZDAzOTdmMGE0ZjBiYmQxMDlmNEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t", text = "Americas" }},   
+    { emea = { href = "https://calendar.google.com/calendar/u/0?cid=OWNjOGI0YmIwMjFiMDE5NGIyNDEzOWRiMjU1NjFmYTc0ZGVhYTc0MzU0YWY1NDkzMDFiNDRhZWNjOTJiMzJiOUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t", text = "EMEA" }},
+    { pacific = { href = "https://calendar.google.com/calendar/u/0?cid=N2EzN2YxZmYzMzdiODBmOWRiOWFhOGVhNWQ2ZDBiYWY5ODE4MDM0YmIyMDhiNDAyNWUzNDFjNGE3NTMyMTE5OUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t", text = "Pacific" }},
+    { china = { href = "https://calendar.google.com/calendar/u/0?cid=ODFhYjAxZTQ1ZmNiNGY5MjViNzZmOTdmYjA0MjA3Mjc3MjUxZjhhM2FhMDUyMGYxMDA3MmUzYzBhMjQyMTdjNEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t", text = "China" }}, 
+    { international = { href = "https://calendar.google.com/calendar/u/0?cid=ZjJiMjY1MTkwZmNkMDY5NjY5M2FiZjgwODE1OGRkZDQ1MTQwNjY1ZGRkMGM1YjM3YWFhYTA0ZGJjZDYxZWFhOEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t", text = "🗺️ All International Matches" }},
+    { github = {href = "https://github.com/miztch/valorant-match-schedule", text = "See All Calendars on GitHub" } }
+  ]
+
+[params]
+  description = 'Check Valorant competitive match schedule on Google Calendar!'
+  images = [ 'img/screenshot.png' ]
+  title = 'Valorant Match Schedule'
+
+[social]
+  twitter = 'm1ztch'
+
+[module]
+  [module.hugoVersion]
+    extended = false
+    min = "0.86.1"
+
+[markup.goldmark.renderer]
+unsafe = true

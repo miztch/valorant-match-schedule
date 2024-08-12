@@ -1,0 +1,16 @@
+{
+    "name": "Go Dev Container",
+    "image": "mcr.microsoft.com/devcontainers/go:1-1.21-bullseye",
+    "features": {
+        "ghcr.io/devcontainers/features/hugo:1": {
+            "version": "0.120.4"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "golang.go"
+            ]
+        }
+    }
+}
