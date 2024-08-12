@@ -61,12 +61,10 @@ jobs:
           hugo \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
-      - name: Check
-        run: pwd && ls -la
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ runner.temp }}/public
+          path: public
 
   # Deployment job
   deploy:
