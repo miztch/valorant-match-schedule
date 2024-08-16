@@ -144,6 +144,8 @@ international_events = [
     "Champions Tour 2024: Pacific Stage 2",
     "Champions Tour 2024: China Stage 2",
     "Valorant Champions 2024",
+    "Game Changers 2024 Championship: Berlin",
+    "Red Bull Home Ground #5",
 ]
 
 abbrs = {
