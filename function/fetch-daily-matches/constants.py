@@ -146,6 +146,13 @@ international_events = [
     "Valorant Champions 2024",
     "Game Changers 2024 Championship: Berlin",
     "Red Bull Home Ground #5",
+    "Champions Tour 2025: Americas Kickoff",
+    "Champions Tour 2025: Pacific Kickoff",
+    "Champions Tour 2025: EMEA Kickoff",
+    "Champions Tour 2025: China Kickoff",
+    "Champions Tour 2025: Masters Bangkok",
+    "Champions Tour 2025: Masters Toronto",
+    "Valorant Champions 2025",
 ]
 
 abbrs = {
