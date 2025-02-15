@@ -91,6 +91,7 @@ sub_areas = {
         "Southeast Asia",
         "South Asia",
         "Oceania",
+        "MY/SG",
     ],
     "BR_LATAM": ["LATAM", "Latin America", "LA-N", "LA-S"],
     "EAST_ASIA": ["East Asia", "KR/JP"],
@@ -105,12 +106,13 @@ sub_areas = {
         "Arabian",
         "Arabic",
         "Africa",
+        "NORTH//EAST",
     ],
     "NA": [],
 }
 
 organizers = {
-    "APAC": [],
+    "APAC": ["Global Esports"],
     "BR_LATAM": [],
     "EAST_ASIA": [],
     "EMEA": ["EMG", "ESTAZ", "GLA"],
