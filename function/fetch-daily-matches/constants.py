@@ -154,6 +154,10 @@ international_events = [
     "Champions Tour 2025: China Kickoff",
     "Champions Tour 2025: Masters Bangkok",
     "Champions Tour 2025: Masters Toronto",
+    "Champions Tour 2025: China Stage 1",
+    "Champions Tour 2025: Americas Stage 1",
+    "Champions Tour 2025: EMEA Stage 1",
+    "Champions Tour 2025: Pacific Stage 1",
     "Valorant Champions 2025",
 ]
 
