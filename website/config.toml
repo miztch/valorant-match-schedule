@@ -19,7 +19,7 @@ googleAnalytics = "G-T160DKFZWX"
     { pacific = { href = "https://calendar.google.com/calendar/u/0?cid=N2EzN2YxZmYzMzdiODBmOWRiOWFhOGVhNWQ2ZDBiYWY5ODE4MDM0YmIyMDhiNDAyNWUzNDFjNGE3NTMyMTE5OUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t", text = "Pacific" }},
     { china = { href = "https://calendar.google.com/calendar/u/0?cid=ODFhYjAxZTQ1ZmNiNGY5MjViNzZmOTdmYjA0MjA3Mjc3MjUxZjhhM2FhMDUyMGYxMDA3MmUzYzBhMjQyMTdjNEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t", text = "China" }}, 
     { international = { href = "https://calendar.google.com/calendar/u/0?cid=ZjJiMjY1MTkwZmNkMDY5NjY5M2FiZjgwODE1OGRkZDQ1MTQwNjY1ZGRkMGM1YjM3YWFhYTA0ZGJjZDYxZWFhOEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t", text = "🗺️ All International Matches" }},
-    { github = {href = "https://github.com/miztch/valorant-match-schedule", text = "See All Calendars on GitHub" } }
+    { github = {href = "https://github.com/miztch/valorant-match-schedule", text = "See All Calendars and iCal URLs on GitHub" } }
   ]
 
 [params]
