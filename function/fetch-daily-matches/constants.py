@@ -159,6 +159,7 @@ international_events = [
     "Champions Tour 2025: EMEA Stage 1",
     "Champions Tour 2025: Pacific Stage 1",
     "Valorant Champions 2025",
+    "Esports World Cup 2025",
 ]
 
 abbrs = {
