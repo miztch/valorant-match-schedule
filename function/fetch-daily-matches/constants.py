@@ -168,6 +168,10 @@ international_events = [
     "VCT 2025: Americas Stage 1",
     "VCT 2025: EMEA Stage 1",
     "VCT 2025: Pacific Stage 1",
+    "VCT 2025: China Stage 2",
+    "VCT 2025: Americas Stage 2",
+    "VCT 2025: EMEA Stage 2",
+    "VCT 2025: Pacific Stage 2",
     "Valorant Champions 2025",
     "Esports World Cup 2025",
 ]
