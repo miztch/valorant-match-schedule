@@ -19,7 +19,7 @@ https://valorant-calendar.mizt.ch/
 | China | [Google Calendar](https://calendar.google.com/calendar/u/0?cid=ODFhYjAxZTQ1ZmNiNGY5MjViNzZmOTdmYjA0MjA3Mjc3MjUxZjhhM2FhMDUyMGYxMDA3MmUzYzBhMjQyMTdjNEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t) | [.iCal](https://calendar.google.com/calendar/ical/81ab01e45fcb4f925b76f97fb04207277251f8a3aa0520f10072e3c0a24217c4%40group.calendar.google.com/public/basic.ics) |
 
 > [!WARNING]
-> - Below are scheduled to be discontinued or removed in the near future
+> - **We are to stop updating calendars below by the end of July 2025.**
 > - I recommend that you replace each of them by subscribing to a new calendar that will replace it.
 
 | Region | Google Calendar | iCal(`.ics`) | Migration guide
