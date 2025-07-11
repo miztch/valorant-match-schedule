@@ -8,7 +8,7 @@ run = "go fmt ./..."
 [tasks.lint]
 depends = ["fmt"]
 run = [
-    "staticcheck ./...",
+    "go tool staticcheck ./...",
     "go vet ./...",
     "go mod tidy",
 ]
