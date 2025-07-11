@@ -2,7 +2,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - v2
+      - main
     paths-ignore:
       - ".github/workflows/*"
       - "**.md"
