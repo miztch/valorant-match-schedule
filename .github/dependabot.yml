@@ -5,16 +5,12 @@
 
 version: 2
 updates:
-  - package-ecosystem: "pip"
-    directory: "/function"
+  - package-ecosystem: "gomod"
+    directory: "/"
     schedule:
       interval: "weekly"
     commit-message:
       prefix: "chore"
-    groups:
-      dependencies:
-        patterns:
-          - "*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:

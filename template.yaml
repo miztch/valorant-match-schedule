@@ -6,14 +6,19 @@ Parameters:
   ApplicationName:
     Description: resource prefix
     Type: String
-    Default: valorant-match-schedule
-  APIEndpointDomainName:
-    Description: Domain name of API endpoint URL of dima (matches API)
+    Default: vms
+  ScheduleExpression:
+    Description: schedule expression for the eventbridge event
     Type: String
-    AllowedPattern: ^([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$
-    ConstraintDescription: should be appropriate domain format
-  GoogleServiceAccountId:
-    Type: String
+    Default: rate(3 hours)
+  PagesToScrape:
+    Description: number of pages to scrape from the API
+    Type: Number
+    Default: 1
+  MaxConcurrency:
+    Description: concurrency of scrape pages
+    Type: Number
+    Default: 1
   CalendarIdAmericas:
     Type: String
   CalendarIdChina:
@@ -24,184 +29,119 @@ Parameters:
     Type: String
   CalendarIdInternational:
     Type: String
-  CalendarIdApac:
+  ServiceAccountKeyParameter:
     Type: String
-  CalendarIdBrLatam:
-    Type: String
-  CalendarIdEastAsia:
-    Type: String
-  CalendarIdNa:
-    Type: String
-  ScheduleExpression:
-    Description: schedule expression for the eventbridge event
-    Type: String
-    Default: rate(3 hours)
-  DaysToGet:
-    Description: days to get match info starting from today
-    Type: Number
-    Default: 30
+    Default: "/google/service-account-key"
   DaysToRetainLogs:
     Description: days to retain logs in CloudWatch
     Type: Number
     Default: 30
 
+Globals:
+  Function:
+    Architectures:
+      - x86_64
+    Handler: bootstrap
+    MemorySize: 128
+    Runtime: provided.al2023
+
 Resources:
-  GoogleAuthLayer:
-    Type: AWS::Serverless::LayerVersion
+  ScrapeMatchesStateMachine:
+    Type: AWS::Serverless::StateMachine
     Properties:
-      LayerName: !Sub ${ApplicationName}-google-auth
-      ContentUri: layer/google-auth/
-      CompatibleRuntimes:
-        - python3.12
-      CompatibleArchitectures:
-        - x86_64
-    Metadata:
-      BuildMethod: python3.12
-      BuildArchitecture: x86_64
-
-  GoogleApiPythonClientLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: !Sub ${ApplicationName}-google-api-python-client
-      ContentUri: layer/google-api-python-client/
-      CompatibleRuntimes:
-        - python3.12
-      CompatibleArchitectures:
-        - x86_64
-    Metadata:
-      BuildMethod: python3.12
-      BuildArchitecture: x86_64
-
-  RequestsLayer:
-    Type: AWS::Serverless::LayerVersion
-    Properties:
-      LayerName: !Sub ${ApplicationName}-requests
-      ContentUri: layer/requests/
-      CompatibleRuntimes:
-        - python3.12
-      CompatibleArchitectures:
-        - x86_64
-    Metadata:
-      BuildMethod: python3.12
-      BuildArchitecture: x86_64
-
-  AddGcalEventFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub ${ApplicationName}-add-gcal-event
-      CodeUri: function/add-gcal-event/
-      Description: "add valorant match to google calendar as a event"
-      Handler: index.lambda_handler
-      Runtime: python3.12
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 30
+      Name: !Sub ${ApplicationName}-scrape-matches
+      DefinitionUri: statemachine/scraping.asl.json
+      DefinitionSubstitutions:
+        PagesToScrape: !Ref PagesToScrape
+        ScrapeMatchesFunctionArn: !GetAtt ScrapeMatchesFunction.Arn
       Policies:
-        - AWSLambdaDynamoDBExecutionRole
-        - AmazonDynamoDBFullAccess
+        LambdaInvokePolicy:
+          FunctionName: !Ref ScrapeMatchesFunction
+      Events:
+        Schedule:
+          Type: ScheduleV2
+          Properties:
+            Name: !Sub ${ApplicationName}-scrape-matches-scheduler
+            ScheduleExpression: !Ref ScheduleExpression
+
+  ScrapeMatchesFunction:
+    Type: AWS::Serverless::Function
+    Metadata:
+      SkipBuild: true
+    Properties:
+      FunctionName: !Sub ${ApplicationName}-scrape-matches
+      CodeUri: .build/scrape/
+      Description: "scrape valorant esports upcoming matches"
+      Timeout: 900
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt ScrapedMatchesQueue.QueueName
       Environment:
         Variables:
-          OUTBOX_TABLE: !Ref OutboxTable
-          GOOGLE_SERVICE_ACCOUNT_ID: !Ref GoogleServiceAccountId
+          SQS_QUEUE_URL: !Ref ScrapedMatchesQueue
+
+  RegisterMatchesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${ApplicationName}-register-matches
+      CodeUri: .build/register/
+      Description: "register valorant matches to DynamoDB"
+      Timeout: 900
+      Policies:
+        DynamoDBCrudPolicy:
+          TableName: !Ref MatchListTable
+      Environment:
+        Variables:
+          MATCHLIST_TABLE: !Ref MatchListTable
+      Events:
+        MySQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt ScrapedMatchesQueue.Arn
+            BatchSize: 25
+            MaximumBatchingWindowInSeconds: 60
+            ScalingConfig:
+              MaximumConcurrency: 2
+
+  UpdateCalendarsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub ${ApplicationName}-update-calendars
+      CodeUri: .build/update-calendars/
+      Description: "create Google Calendar events from DynamoDB Stream"
+      Timeout: 60
+      Layers:
+        - arn:aws:lambda:us-east-1:177933569100:layer:AWS-Parameters-and-Secrets-Lambda-Extension:11
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref MatchListTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref OutboxTable
+        - SSMParameterWithSlashPrefixReadPolicy:
+            ParameterName: !Ref ServiceAccountKeyParameter
+      Environment:
+        Variables:
+          CALENDAR_EVENT_TABLE: !Ref OutboxTable
           CALENDAR_ID_AMERICAS: !Ref CalendarIdAmericas
           CALENDAR_ID_CHINA: !Ref CalendarIdChina
           CALENDAR_ID_EMEA: !Ref CalendarIdEmea
           CALENDAR_ID_PACIFIC: !Ref CalendarIdPacific
           CALENDAR_ID_INTERNATIONAL: !Ref CalendarIdInternational
-          CALENDAR_ID_APAC: !Ref CalendarIdApac
-          CALENDAR_ID_BR_LATAM: !Ref CalendarIdBrLatam
-          CALENDAR_ID_EAST_ASIA: !Ref CalendarIdEastAsia
-          CALENDAR_ID_NA: !Ref CalendarIdNa
-      Layers:
-        - !Ref GoogleAuthLayer
-        - !Ref GoogleApiPythonClientLayer
+          SERVICE_ACCOUNT_KEY_PARAMETER: !Ref ServiceAccountKeyParameter
       Events:
-        Stream:
+        DynamoDBStream:
           Type: DynamoDB
           Properties:
             Stream: !GetAtt MatchListTable.StreamArn
-            BatchSize: 1
+            BatchSize: 10
             BisectBatchOnFunctionError: true
             Enabled: true
             StartingPosition: TRIM_HORIZON
 
-  AddGCalFunctionLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${AddGcalEventFunction}
-      RetentionInDays: !Ref DaysToRetainLogs
-
-  GetMatchListFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub ${ApplicationName}-get-match-list
-      CodeUri: function/get-match-list/
-      Description: "invoke fetch-daily-matches function via SQS queue publishing"
-      Handler: index.lambda_handler
-      Runtime: python3.12
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 180
-      Policies:
-        - AmazonSQSFullAccess
-      Environment:
-        Variables:
-          FETCH_DAILY_MATCHES_QUEUE_URL: !Ref FetchDailyMatchesQueue
-          BASE_DELAY_SECONDS: 30
-          DAYS_TO_GET: !Ref DaysToGet
-      Events:
-        CloudWatchEvent:
-          Type: Schedule
-          Properties:
-            Schedule: !Ref ScheduleExpression
-
-  GetMatchListFunctionLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${GetMatchListFunction}
-      RetentionInDays: !Ref DaysToRetainLogs
-
-  FetchDailyMatchesFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      FunctionName: !Sub ${ApplicationName}-fetch-daily-matches
-      CodeUri: function/fetch-daily-matches/
-      Description: "fetch daily valorant matches"
-      Handler: index.lambda_handler
-      Runtime: python3.12
-      Architectures:
-        - x86_64
-      MemorySize: 128
-      Timeout: 900
-      Policies:
-        - AmazonDynamoDBFullAccess
-      Environment:
-        Variables:
-          API_DOMAIN_NAME: !Ref APIEndpointDomainName
-          MATCHLIST_TABLE: !Ref MatchListTable
-      Layers:
-        - !Ref RequestsLayer
-      Events:
-        MySQSEvent:
-          Type: SQS
-          Properties:
-            Queue: !GetAtt FetchDailyMatchesQueue.Arn
-            BatchSize: 1
-            ScalingConfig:
-              MaximumConcurrency: 2
-
-  FetchDailyMatchesFunctionLogGroup:
-    Type: AWS::Logs::LogGroup
-    Properties:
-      LogGroupName: !Sub /aws/lambda/${FetchDailyMatchesFunction}
-      RetentionInDays: !Ref DaysToRetainLogs
-
-  FetchDailyMatchesQueue:
+  ScrapedMatchesQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: !Sub ${ApplicationName}-fetch-daily-matches-queue
+      QueueName: !Sub ${ApplicationName}-scraped-matches
       DelaySeconds: 10
       VisibilityTimeout: 1000
 
@@ -252,3 +192,21 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: ttl
         Enabled: true
+
+  ScrapeMatchesFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ScrapeMatchesFunction}
+      RetentionInDays: !Ref DaysToRetainLogs
+
+  RegisterMatchesFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${RegisterMatchesFunction}
+      RetentionInDays: !Ref DaysToRetainLogs
+
+  UpdateCalendarsFunctionLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${UpdateCalendarsFunction}
+      RetentionInDays: !Ref DaysToRetainLogs
