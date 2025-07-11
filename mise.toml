@@ -1,0 +1,29 @@
+[tools]
+aws-sam-cli = "1.142.1"
+go = "1.24.1"
+
+[tasks.fmt]
+run = "go fmt ./..."
+
+[tasks.lint]
+depends = ["fmt"]
+run = [
+    "staticcheck ./...",
+    "go vet ./...",
+    "go mod tidy",
+]
+
+[tasks.build]
+depends = ["fmt", "lint"]
+env = { "GOOS" =  "linux", "GOARCH" = "amd64", "CGO_ENABLED" = "0" }
+run = [
+    "go build -trimpath -tags lambda.norpc -o .build/scrape/bootstrap cmd/scrape/main.go",
+    "go build -trimpath -tags lambda.norpc -o .build/register/bootstrap cmd/register/main.go",
+    "go build -trimpath -tags lambda.norpc -o .build/update-calendars/bootstrap cmd/update-calendars/main.go",
+]
+
+[tasks.deploy_dev]
+depends = ["fmt", "lint", "build"]
+run = [
+    "sam deploy --config-file samconfig.toml --config-env dev"
+]

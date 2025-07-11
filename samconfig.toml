@@ -1,0 +1,45 @@
+version = 0.1
+
+[dev.deploy.parameters]
+stack_name = "dev-vms"
+region = "us-east-1"
+
+resolve_s3 = true
+s3_prefix = "dev-vms"
+
+capabilities = "CAPABILITY_IAM CAPABILITY_NAMED_IAM"
+confirm_changeset = true
+
+parameter_overrides = [
+    "ApplicationName=dev-vms",
+    "ScheduleExpression=\"rate(10 days)\"",
+    "PagesToScrape=1",
+    "MaxConcurrency=1",
+    "CalendarIdAmericas=7035c12cb97e1003f631c09adf383abbac2b48f0c9dfd7a891df2d4bade21500@group.calendar.google.com",
+    "CalendarIdChina=459f0fcfaff890e14830eed123993874000515a79f981883de3fa7763a0686e5@group.calendar.google.com",
+    "CalendarIdEmea=2c31ae161d58140cd5c83ef570857717b60ed736baf2d486b7ab5e1ae6126f8e@group.calendar.google.com",
+    "CalendarIdPacific=3bb87e9f335bb35f637b5a1996719693135a386d9e25fba3a2a8f19ed8f25413@group.calendar.google.com",
+    "CalendarIdInternational=f36406a37e964a595a759d63ea7ce08743fb09378c3aae8d210667c5c54fab6a@group.calendar.google.com",
+]
+
+[production.deploy.parameters]
+stack_name = "vms"
+region = "us-east-1"
+
+resolve_s3 = true
+s3_prefix = "vms"
+
+capabilities = "CAPABILITY_IAM CAPABILITY_NAMED_IAM"
+confirm_changeset = true
+
+parameter_overrides = [
+    "ApplicationName=vms",
+    "ScheduleExpression=\"rate(3 hours)\"",
+    "PagesToScrape=6",
+    "MaxConcurrency=1",
+    "CalendarIdAmericas=bdde0f5faa46e41ddfabde2fb8ed6ae7197b646142b8ed0397f0a4f0bbd109f4@group.calendar.google.com",
+    "CalendarIdChina=81ab01e45fcb4f925b76f97fb04207277251f8a3aa0520f10072e3c0a24217c4@group.calendar.google.com",
+    "CalendarIdEmea=9cc8b4bb021b0194b24139db25561fa74deaa74354af549301b44aecc92b32b9@group.calendar.google.com",
+    "CalendarIdPacific=7a37f1ff337b80f9db9aa8ea5d6d0baf9818034bb208b4025e341c4a75321199@group.calendar.google.com",
+    "CalendarIdInternational=f2b265190fcd0696693abf808158ddd45140665ddd0c5b37aaaa04dbcd61eaa8@group.calendar.google.com",
+]

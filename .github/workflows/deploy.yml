@@ -2,10 +2,9 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - v2
     paths-ignore:
       - ".github/workflows/*"
-      - "**.svg"
       - "**.md"
       - "website/**"
 
@@ -20,73 +19,22 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Install jq
-        uses: dcarbone/install-jq-action@v3.2.0
-      - name: Setup Python
-        uses: actions/setup-python@v5
-      - name: Setup AWS SAM CLI
-        uses: aws-actions/setup-sam@v2
+      - uses: jdx/mise-action@v2
         with:
-          use-installer: true
+          cache: true
       - name: Setup AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4.2.1
         with:
           role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
           mask-aws-account-id: true
-      - name: Setup Google service account key file
-        env:
-          GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
-        run: |
-          # base64 decode key and write out to the file
-          echo $GOOGLE_SERVICE_ACCOUNT_KEY | base64 -d > function/add-gcal-event/service_account_key.json
-      - name: Prepare SAM parameters
-        env:
-          APPLICATION_NAME: "valorant-match-schedule"
-          API_ENDPOINT_DOMAIN_NAME: ${{ secrets.API_ENDPOINT_DOMAIN_NAME }}
-          GOOGLE_SERVICE_ACCOUNT_ID: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_ID }}
-          GCAL_ID_AMERICAS: ${{ vars.GCAL_ID_AMERICAS }}
-          GCAL_ID_CHINA: ${{ vars.GCAL_ID_CHINA }}
-          GCAL_ID_EMEA: ${{ vars.GCAL_ID_EMEA }}
-          GCAL_ID_PACIFIC: ${{ vars.GCAL_ID_PACIFIC }}
-          GCAL_ID_INTERNATIONAL: ${{ vars.GCAL_ID_INTERNATIONAL }}
-          GCAL_ID_APAC: ${{ vars.GCAL_ID_APAC }}
-          GCAL_ID_BR_LATAM: ${{ vars.GCAL_ID_BR_LATAM }}
-          GCAL_ID_EAST_ASIA: ${{ vars.GCAL_ID_EAST_ASIA }}
-          GCAL_ID_NA: ${{ vars.GCAL_ID_NA }}
-        run: |
-          tee params.json << EOF
-          { 
-            "ApplicationName": "${APPLICATION_NAME}",
-            "APIEndpointDomainName": "${API_ENDPOINT_DOMAIN_NAME}",
-            "GoogleServiceAccountId": "${GOOGLE_SERVICE_ACCOUNT_ID}",
-            "CalendarIdAmericas": "${GCAL_ID_AMERICAS}",
-            "CalendarIdChina": "${GCAL_ID_CHINA}",
-            "CalendarIdEmea": "${GCAL_ID_EMEA}",
-            "CalendarIdPacific": "${GCAL_ID_PACIFIC}",
-            "CalendarIdInternational": "${GCAL_ID_INTERNATIONAL}",
-            "CalendarIdApac": "${GCAL_ID_APAC}",
-            "CalendarIdBrLatam": "${GCAL_ID_BR_LATAM}",
-            "CalendarIdEastAsia": "${GCAL_ID_EAST_ASIA}",
-            "CalendarIdNa": "${GCAL_ID_NA}"
-          }
-          EOF
-      - name: Build SAM packages
-        run: sam build --use-container --parallel
+      - name: Build Go functions
+        run: mise build
       - name: Deploy SAM application
-        env:
-          BUCKET_NAME: ${{ secrets.PROVISIONING_BUCKET_NAME }}
-          REGION: ${{ secrets.AWS_REGION }}
-          STACK_NAME: ${{ vars.STACK_NAME }}
         run: |
           sam deploy \
-            --template-file .aws-sam/build/template.yaml \
-            --stack-name $STACK_NAME \
-            --s3-bucket $BUCKET_NAME \
-            --s3-prefix $STACK_NAME \
-            --capabilities CAPABILITY_IAM CAPABILITY_AUTO_EXPAND \
-            --region $REGION \
+            --config-file samconfig.toml \
+            --config-env production \
             --force-upload \
             --no-confirm-changeset \
-            --no-fail-on-empty-changeset \
-            --parameter-overrides "$(jq -j 'to_entries[] | "\(.key)='\\\"'\(.value)'\\\"''\ '"' params.json)"
+            --no-fail-on-empty-changeset
