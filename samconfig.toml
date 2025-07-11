@@ -3,7 +3,6 @@ version = 0.1
 [dev.deploy.parameters]
 stack_name = "dev-vms"
 region = "us-east-1"
-
 resolve_s3 = true
 s3_prefix = "dev-vms"
 
