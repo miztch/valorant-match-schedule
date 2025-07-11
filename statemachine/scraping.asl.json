@@ -1,0 +1,58 @@
+{
+    "Comment": "Scrape defined vlr.gg match pages",
+    "StartAt": "Count pages to scrape",
+    "States": {
+        "Count pages to scrape": {
+            "Type": "Pass",
+            "Parameters": {
+                "pages.$": "States.ArrayRange(1,${PagesToScrape},1)"
+            },
+            "Next": "Queue Lambda Functions"
+        },
+        "Queue Lambda Functions": {
+            "Type": "Map",
+            "MaxConcurrency": 1,
+            "InputPath": "$.pages",
+            "ItemSelector": {
+                "page.$": "$$.Map.Item.Value"
+            },
+            "ItemProcessor": {
+                "ProcessorConfig": {
+                    "Mode": "INLINE"
+                },
+                "StartAt": "Wait",
+                "States": {
+                    "Wait": {
+                        "Type": "Wait",
+                        "Seconds": 30,
+                        "Next": "Scrape Matches"
+                    },
+                    "Scrape Matches": {
+                        "Type": "Task",
+                        "Resource": "${ScrapeMatchesFunctionArn}:$LATEST",
+                        "OutputPath": "$.Payload",
+                        "Parameters": {
+                            "page.$": "$.page"
+                        },
+                        "ResultPath": "$.Payload.Result",
+                        "Retry": [
+                            {
+                                "ErrorEquals": [
+                                    "Lambda.ServiceException",
+                                    "Lambda.AWSLambdaException",
+                                    "Lambda.SdkClientException",
+                                    "Lambda.TooManyRequestsException"
+                                ],
+                                "IntervalSeconds": 1,
+                                "MaxAttempts": 3,
+                                "BackoffRate": 2
+                            }
+                        ],
+                        "End": true
+                    }
+                }
+            },
+            "End": true
+        }
+    }
+}
