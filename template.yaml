@@ -11,6 +11,13 @@ Parameters:
     Description: schedule expression for the eventbridge event
     Type: String
     Default: rate(3 hours)
+  ScheduleState:
+    Description: state of the eventbridge event
+    Type: String
+    Default: ENABLED
+    AllowedValues:
+      - ENABLED
+      - DISABLED
   CalendarIdAmericas:
     Type: String
   CalendarIdChina:
@@ -54,6 +61,7 @@ Resources:
           Properties:
             Name: !Sub ${ApplicationName}-scrape-matches-scheduler
             ScheduleExpression: !Ref ScheduleExpression
+            State: !Ref ScheduleState
 
   ScrapeMatchesFunction:
     Type: AWS::Serverless::Function

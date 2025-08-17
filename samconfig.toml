@@ -12,6 +12,7 @@ confirm_changeset = true
 parameter_overrides = [
     "ApplicationName=dev-vms",
     "ScheduleExpression=\"rate(10 days)\"",
+    "ScheduleState=DISABLED",
     "CalendarIdAmericas=7035c12cb97e1003f631c09adf383abbac2b48f0c9dfd7a891df2d4bade21500@group.calendar.google.com",
     "CalendarIdChina=459f0fcfaff890e14830eed123993874000515a79f981883de3fa7763a0686e5@group.calendar.google.com",
     "CalendarIdEmea=2c31ae161d58140cd5c83ef570857717b60ed736baf2d486b7ab5e1ae6126f8e@group.calendar.google.com",
