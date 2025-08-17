@@ -11,10 +11,6 @@ Parameters:
     Description: schedule expression for the eventbridge event
     Type: String
     Default: rate(3 hours)
-  MaxConcurrency:
-    Description: concurrency of scrape pages
-    Type: Number
-    Default: 1
   CalendarIdAmericas:
     Type: String
   CalendarIdChina:
