@@ -11,10 +11,6 @@ Parameters:
     Description: schedule expression for the eventbridge event
     Type: String
     Default: rate(3 hours)
-  PagesToScrape:
-    Description: number of pages to scrape from the API
-    Type: Number
-    Default: 1
   MaxConcurrency:
     Description: concurrency of scrape pages
     Type: Number
@@ -52,7 +48,6 @@ Resources:
       Name: !Sub ${ApplicationName}-scrape-matches
       DefinitionUri: statemachine/scraping.asl.json
       DefinitionSubstitutions:
-        PagesToScrape: !Ref PagesToScrape
         ScrapeMatchesFunctionArn: !GetAtt ScrapeMatchesFunction.Arn
       Policies:
         LambdaInvokePolicy:
