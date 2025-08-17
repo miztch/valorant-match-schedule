@@ -110,7 +110,7 @@ Resources:
       Description: "create Google Calendar events from DynamoDB Stream"
       Timeout: 60
       Layers:
-        - arn:aws:lambda:us-east-1:177933569100:layer:AWS-Parameters-and-Secrets-Lambda-Extension:11
+        - arn:aws:lambda:us-east-1:177933569100:layer:AWS-Parameters-and-Secrets-Lambda-Extension:18
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref MatchListTable
