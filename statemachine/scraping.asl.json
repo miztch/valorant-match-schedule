@@ -1,56 +1,114 @@
 {
-    "Comment": "Scrape defined vlr.gg match pages",
-    "StartAt": "Count pages to scrape",
+    "Comment": "Scrape vlr.gg match pages",
+    "StartAt": "Initialize Loop State",
     "States": {
-        "Count pages to scrape": {
+        "Initialize Loop State": {
             "Type": "Pass",
             "Parameters": {
-                "pages.$": "States.ArrayRange(1,${PagesToScrape},1)"
+                "currentPage": 1,
+                "maxPages": 10,
+                "shouldContinue": true
             },
-            "Next": "Queue Lambda Functions"
+            "Next": "Check Continue Condition"
         },
-        "Queue Lambda Functions": {
-            "Type": "Map",
-            "MaxConcurrency": 1,
-            "InputPath": "$.pages",
-            "ItemSelector": {
-                "page.$": "$$.Map.Item.Value"
-            },
-            "ItemProcessor": {
-                "ProcessorConfig": {
-                    "Mode": "INLINE"
-                },
-                "StartAt": "Wait",
-                "States": {
-                    "Wait": {
-                        "Type": "Wait",
-                        "Seconds": 30,
-                        "Next": "Scrape Matches"
-                    },
-                    "Scrape Matches": {
-                        "Type": "Task",
-                        "Resource": "${ScrapeMatchesFunctionArn}:$LATEST",
-                        "OutputPath": "$.Payload",
-                        "Parameters": {
-                            "page.$": "$.page"
+        "Check Continue Condition": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "And": [
+                        {
+                            "Variable": "$.shouldContinue",
+                            "BooleanEquals": true
                         },
-                        "ResultPath": "$.Payload.Result",
-                        "Retry": [
-                            {
-                                "ErrorEquals": [
-                                    "Lambda.ServiceException",
-                                    "Lambda.AWSLambdaException",
-                                    "Lambda.SdkClientException",
-                                    "Lambda.TooManyRequestsException"
-                                ],
-                                "IntervalSeconds": 1,
-                                "MaxAttempts": 3,
-                                "BackoffRate": 2
-                            }
-                        ],
-                        "End": true
-                    }
+                        {
+                            "Variable": "$.currentPage",
+                            "NumericLessThanEqualsPath": "$.maxPages"
+                        }
+                    ],
+                    "Next": "Wait Before Scraping"
                 }
+            ],
+            "Default": "Execution Complete"
+        },
+        "Wait Before Scraping": {
+            "Type": "Wait",
+            "Seconds": 30,
+            "Next": "Scrape Matches"
+        },
+        "Scrape Matches": {
+            "Type": "Task",
+            "Resource": "${ScrapeMatchesFunctionArn}:$LATEST",
+            "Parameters": {
+                "page.$": "$.currentPage"
+            },
+            "ResultPath": "$.lambdaResult",
+            "Retry": [
+                {
+                    "ErrorEquals": [
+                        "Lambda.ServiceException",
+                        "Lambda.AWSLambdaException",
+                        "Lambda.SdkClientException",
+                        "Lambda.TooManyRequestsException"
+                    ],
+                    "IntervalSeconds": 1,
+                    "MaxAttempts": 3,
+                    "BackoffRate": 2
+                }
+            ],
+            "Next": "Parse Lambda Output"
+        },
+        "Parse Lambda Output": {
+            "Type": "Pass",
+            "Parameters": {
+                "currentPage.$": "$.currentPage",
+                "maxPages.$": "$.maxPages",
+                "lambdaResult.$": "$.lambdaResult",
+                "parsedOutput.$": "States.StringToJson($.lambdaResult)"
+            },
+            "Next": "Check Matches Count"
+        },
+        "Check Matches Count": {
+            "Type": "Choice",
+            "Choices": [
+                {
+                    "Variable": "$.parsedOutput.matches_count",
+                    "NumericLessThan": 50,
+                    "Next": "Stop Processing"
+                }
+            ],
+            "Default": "Continue Processing"
+        },
+        "Continue Processing": {
+            "Type": "Pass",
+            "Parameters": {
+                "currentPage.$": "States.MathAdd($.currentPage, 1)",
+                "maxPages.$": "$.maxPages",
+                "shouldContinue": true,
+                "lastResult.$": "$.lambdaResult",
+                "lastMatchesCount.$": "$.parsedOutput.matches_count"
+            },
+            "Next": "Check Continue Condition"
+        },
+        "Stop Processing": {
+            "Type": "Pass",
+            "Parameters": {
+                "currentPage.$": "$.currentPage",
+                "maxPages.$": "$.maxPages",
+                "shouldContinue": false,
+                "terminationReason": "matches_count was less than 50",
+                "finalMatchesCount.$": "$.parsedOutput.matches_count",
+                "lastResult.$": "$.lambdaResult"
+            },
+            "Next": "Check Continue Condition"
+        },
+        "Execution Complete": {
+            "Type": "Pass",
+            "Parameters": {
+                "totalPagesProcessed.$": "States.MathAdd($.currentPage, -1)",
+                "terminationReason.$": "$.terminationReason",
+                "finalMatchesCount.$": "$.finalMatchesCount",
+                "lastResult.$": "$.lastResult",
+                "completionReason.$": "States.Format('Loop completed. shouldContinue: {}, currentPage: {}, maxPages: {}', $.shouldContinue, $.currentPage, $.maxPages)"
             },
             "End": true
         }

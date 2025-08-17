@@ -11,14 +11,13 @@ Parameters:
     Description: schedule expression for the eventbridge event
     Type: String
     Default: rate(3 hours)
-  PagesToScrape:
-    Description: number of pages to scrape from the API
-    Type: Number
-    Default: 1
-  MaxConcurrency:
-    Description: concurrency of scrape pages
-    Type: Number
-    Default: 1
+  ScheduleState:
+    Description: state of the eventbridge event
+    Type: String
+    Default: ENABLED
+    AllowedValues:
+      - ENABLED
+      - DISABLED
   CalendarIdAmericas:
     Type: String
   CalendarIdChina:
@@ -52,7 +51,6 @@ Resources:
       Name: !Sub ${ApplicationName}-scrape-matches
       DefinitionUri: statemachine/scraping.asl.json
       DefinitionSubstitutions:
-        PagesToScrape: !Ref PagesToScrape
         ScrapeMatchesFunctionArn: !GetAtt ScrapeMatchesFunction.Arn
       Policies:
         LambdaInvokePolicy:
@@ -63,6 +61,7 @@ Resources:
           Properties:
             Name: !Sub ${ApplicationName}-scrape-matches-scheduler
             ScheduleExpression: !Ref ScheduleExpression
+            State: !Ref ScheduleState
 
   ScrapeMatchesFunction:
     Type: AWS::Serverless::Function
@@ -111,7 +110,7 @@ Resources:
       Description: "create Google Calendar events from DynamoDB Stream"
       Timeout: 60
       Layers:
-        - arn:aws:lambda:us-east-1:177933569100:layer:AWS-Parameters-and-Secrets-Lambda-Extension:11
+        - arn:aws:lambda:us-east-1:177933569100:layer:AWS-Parameters-and-Secrets-Lambda-Extension:18
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref MatchListTable
