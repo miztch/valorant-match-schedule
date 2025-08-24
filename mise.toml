@@ -5,8 +5,11 @@ go = "1.24.1"
 [tasks.fmt]
 run = "go fmt ./..."
 
+[tasks.test]
+run = "go test -v ./..."
+
 [tasks.lint]
-depends = ["fmt"]
+depends = ["fmt", "test"]
 run = [
     "go tool staticcheck ./...",
     "go vet ./...",
@@ -14,7 +17,7 @@ run = [
 ]
 
 [tasks.build]
-depends = ["fmt", "lint"]
+depends = ["lint"]
 env = { "GOOS" =  "linux", "GOARCH" = "amd64", "CGO_ENABLED" = "0" }
 run = [
     "go build -trimpath -tags lambda.norpc -o .build/scrape/bootstrap cmd/scrape/main.go",
@@ -23,7 +26,13 @@ run = [
 ]
 
 [tasks.deploy_dev]
-depends = ["fmt", "lint", "build"]
+depends = ["build"]
 run = [
     "sam deploy --config-file samconfig.toml --config-env dev"
+]
+
+[tasks.run_dev]
+env = { "AWS_DEFAULT_REGION" = "us-east-1" }
+run = [
+    "aws stepfunctions start-execution --state-machine-arn $(aws stepfunctions list-state-machines --query 'stateMachines[?name==`dev-vms-scrape-matches`].stateMachineArn' --output text) --name $(date +%Y%m%d-%H%M%S)"
 ]

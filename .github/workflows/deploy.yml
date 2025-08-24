@@ -29,7 +29,7 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
           mask-aws-account-id: true
       - name: Build Go functions
-        run: mise build
+        run: mise run build
       - name: Deploy SAM application
         run: |
           sam deploy \
