@@ -7,6 +7,7 @@ import (
 
 	"github.com/miztch/valorant-match-schedule/internal/domain"
 	"github.com/miztch/valorant-match-schedule/internal/dto"
+	"github.com/miztch/valorant-match-schedule/pkg/country"
 )
 
 const (
@@ -47,7 +48,10 @@ func calcTTL(endTime string, offset int64) (ttl int64) {
 
 // Region
 func mapFlagToRegion(countryFlag string) string {
-	return CountryToRegionMap[countryFlag]
+	if info, exists := country.Countries[countryFlag]; exists {
+		return info.Region
+	}
+	return ""
 }
 
 // containsAny checks if the eventName contains any of the keywords in the list.
@@ -61,12 +65,12 @@ func containsAny(eventName string, keywords []string) bool {
 }
 
 func EstimateRegionByEvent(eventName string) string {
-	for region, keywords := range SubAreas {
+	for region, keywords := range country.SubAreas {
 		if containsAny(eventName, keywords) {
 			return region
 		}
 	}
-	for region, orgs := range Organizers {
+	for region, orgs := range country.Organizers {
 		if containsAny(eventName, orgs) {
 			return region
 		}
@@ -75,7 +79,7 @@ func EstimateRegionByEvent(eventName string) string {
 }
 
 func isInternationalEvent(eventName string) bool {
-	return containsAny(eventName, InternationalEvents)
+	return containsAny(eventName, country.InternationalEvents)
 }
 
 // MatchToDTO converts domain.Match to dto.Match
