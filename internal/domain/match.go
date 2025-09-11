@@ -1,5 +1,11 @@
 package domain
 
+import (
+	"slices"
+
+	"github.com/miztch/valorant-match-schedule/pkg/country"
+)
+
 // VlrMatch represents a match from vlr.gg
 type VlrMatch struct {
 	Id            int
@@ -12,7 +18,7 @@ type VlrMatch struct {
 	EventPagePath string
 }
 
-// Match represents a match (for business logic only, no DTO tags)
+// Match represents a match with associated event details
 type Match struct {
 	Id               int
 	Name             string
@@ -21,12 +27,12 @@ type Match struct {
 	BestOf           int
 	Teams            []Team
 	PagePath         string
+	EventId          int
 	EventName        string
 	EventCountryFlag string
 }
 
 // Team represents a team
-// DTO tags removed
 type Team struct {
 	Name string
 }
@@ -41,7 +47,13 @@ func NewMatch(m VlrMatch, e VlrEvent) Match {
 		BestOf:           m.BestOf,
 		Teams:            m.Teams,
 		PagePath:         m.PagePath,
+		EventId:          e.Id,
 		EventName:        e.Name,
 		EventCountryFlag: e.CountryFlag,
 	}
+}
+
+// isInternational checks if the event which provided match belongs to is an international event
+func (m Match) IsInternational() bool {
+	return slices.Contains(country.InternationalEvents, m.EventId)
 }

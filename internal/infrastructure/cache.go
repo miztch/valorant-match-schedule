@@ -1,6 +1,7 @@
 package infrastructure
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/patrickmn/go-cache"
@@ -31,8 +32,9 @@ func (c *EventCache) getEventFromCache(id string) (domain.VlrEvent, bool) {
 
 // CacheEvent caches an event
 func (c *EventCache) cacheEvent(e domain.VlrEvent) {
-	_, exist := c.getEventFromCache(e.Id)
+	idStr := strconv.Itoa(e.Id)
+	_, exist := c.getEventFromCache(idStr)
 	if !exist {
-		c.cache.Add(e.Id, e, cache.DefaultExpiration)
+		c.cache.Add(idStr, e, cache.DefaultExpiration)
 	}
 }
