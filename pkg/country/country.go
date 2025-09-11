@@ -337,5 +337,6 @@ var InternationalEvents = []string{
 	"VCT 2025: EMEA Stage 2",
 	"VCT 2025: Pacific Stage 2",
 	"Valorant Champions 2025",
+	"Valorant  Champions 2025", // hotfix for typo on upstream
 	"Esports World Cup 2025",
 }
