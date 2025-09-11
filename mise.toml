@@ -13,6 +13,14 @@ run = ["go tool staticcheck ./...", "go vet ./...", "go mod tidy"]
 depends = ["lint"]
 run = ["go test -v ./..."]
 
+[tasks.cover]
+depends = ["lint"]
+run = [
+    "go test -coverprofile=coverage.out ./...",
+    "go tool cover -html=coverage.out -o coverage.html",
+    "open coverage.html",
+]
+
 [tasks.build]
 depends = ["test"]
 env = { "GOOS" = "linux", "GOARCH" = "amd64", "CGO_ENABLED" = "0" }
