@@ -5,20 +5,21 @@ go = "1.24.1"
 [tasks.fmt]
 run = "go fmt ./..."
 
-[tasks.test]
-run = "go test -v ./..."
-
 [tasks.lint]
-depends = ["fmt", "test"]
+depends = ["fmt"]
 run = [
-    "go tool staticcheck ./...",
-    "go vet ./...",
-    "go mod tidy",
+    "go tool staticcheck ./...", "go vet ./...", "go mod tidy"
+]
+
+[tasks.test]
+depends = ["lint"]
+run = [
+    "go test -v ./..."
 ]
 
 [tasks.build]
-depends = ["lint"]
-env = { "GOOS" =  "linux", "GOARCH" = "amd64", "CGO_ENABLED" = "0" }
+depends = ["test"]
+env = { "GOOS" = "linux", "GOARCH" = "amd64", "CGO_ENABLED" = "0" }
 run = [
     "go build -trimpath -tags lambda.norpc -o .build/scrape/bootstrap cmd/scrape/main.go",
     "go build -trimpath -tags lambda.norpc -o .build/register/bootstrap cmd/register/main.go",
