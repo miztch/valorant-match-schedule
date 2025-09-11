@@ -3,19 +3,15 @@ aws-sam-cli = "1.142.1"
 go = "1.24.1"
 
 [tasks.fmt]
-run = "go fmt ./..."
+run = ["go fmt ./..."]
 
 [tasks.lint]
 depends = ["fmt"]
-run = [
-    "go tool staticcheck ./...", "go vet ./...", "go mod tidy"
-]
+run = ["go tool staticcheck ./...", "go vet ./...", "go mod tidy"]
 
 [tasks.test]
 depends = ["lint"]
-run = [
-    "go test -v ./..."
-]
+run = ["go test -v ./..."]
 
 [tasks.build]
 depends = ["test"]
@@ -35,5 +31,5 @@ run = [
 [tasks.run_dev]
 env = { "AWS_DEFAULT_REGION" = "us-east-1" }
 run = [
-    "aws stepfunctions start-execution --state-machine-arn $(aws stepfunctions list-state-machines --query 'stateMachines[?name==`dev-vms-scrape-matches`].stateMachineArn' --output text) --name $(date +%Y%m%d-%H%M%S)"
+    "aws stepfunctions start-execution --state-machine-arn $(aws stepfunctions list-state-machines --query 'stateMachines[?name==`dev-vms-scrape-matches`].stateMachineArn' --output text) --name $(date +%Y%m%d-%H%M%S)",
 ]
