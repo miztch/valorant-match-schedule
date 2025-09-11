@@ -23,7 +23,7 @@ func TestMatchToDTO(t *testing.T) {
 				BestOf:           3,
 				Teams:            []domain.Team{{Name: "Twisted Minds"}, {Name: "Team RA'AD"}},
 				PagePath:         "/531976/twisted-minds-vs-team-raad-challengers-2025-mena-resilience-lan-finals-lr1",
-				EventId:          "2577",
+				EventId:          2577,
 				EventName:        "Challengers 2025: MENA Resilience LAN Finals",
 				EventCountryFlag: "sa",
 			},
@@ -51,7 +51,7 @@ func TestMatchToDTO(t *testing.T) {
 				BestOf:           5,
 				Teams:            []domain.Team{{Name: "EDward Gaming"}, {Name: "Team Heretics"}},
 				PagePath:         "/378829/edward-gaming-vs-team-heretics-valorant-champions-2024-gf",
-				EventId:          "2097",
+				EventId:          2097,
 				EventName:        "Valorant Champions 2024",
 				EventCountryFlag: "kr",
 			},
@@ -79,7 +79,7 @@ func TestMatchToDTO(t *testing.T) {
 				BestOf:           0, // default to 0
 				Teams:            []domain.Team{{Name: "TBD"}, {Name: "TBD"}},
 				PagePath:         "/999999/match-with-lack-of-information",
-				EventId:          "9999",
+				EventId:          9999,
 				EventName:        "Empty Event",
 				EventCountryFlag: "un",
 			},
@@ -123,7 +123,6 @@ func Test_mapFlagToRegion(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := mapFlagToRegion(tt.countryFlag)
-			// TODO: update the condition below to compare got with tt.want.
 			if got != tt.want {
 				t.Errorf("mapFlagToRegion() = %v, want %v", got, tt.want)
 			}

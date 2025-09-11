@@ -27,7 +27,7 @@ type Match struct {
 	BestOf           int
 	Teams            []Team
 	PagePath         string
-	EventId          string
+	EventId          int
 	EventName        string
 	EventCountryFlag string
 }

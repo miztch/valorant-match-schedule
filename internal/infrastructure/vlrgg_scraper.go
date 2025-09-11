@@ -82,9 +82,15 @@ func (v *VlrGGScraper) getMatchURLList(pageNumber int) ([]string, error) {
 }
 
 // parseScrapedEvent parses a scraped event from vlr.gg
-func parseScrapedEvent(e *colly.HTMLElement, eventUrlPath string) domain.VlrEvent {
+func parseScrapedEvent(e *colly.HTMLElement, eventUrlPath string) (domain.VlrEvent, error) {
+	idStr := strings.Split(eventUrlPath, "/")[2]
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return domain.VlrEvent{}, err
+	}
+
 	vlrEvent := domain.VlrEvent{
-		Id:   strings.Split(eventUrlPath, "/")[2],
+		Id:   id,
 		Name: e.ChildText(".wf-title"),
 	}
 
@@ -93,7 +99,7 @@ func parseScrapedEvent(e *colly.HTMLElement, eventUrlPath string) domain.VlrEven
 	countryFlag := r.Replace(countryFlagPlaceHolder)
 
 	vlrEvent.CountryFlag = countryFlag
-	return vlrEvent
+	return vlrEvent, nil
 }
 
 // scrapeEvent scrapes an event from vlr.gg
@@ -102,7 +108,12 @@ func (v *VlrGGScraper) scrapeEvent(eventUrlPath string) (domain.VlrEvent, error)
 
 	var event domain.VlrEvent
 	v.Collector.OnHTML(".event-header", func(e *colly.HTMLElement) {
-		event = parseScrapedEvent(e, eventUrlPath)
+		var err error
+		event, err = parseScrapedEvent(e, eventUrlPath)
+		if err != nil {
+			slog.Error("Failed to parse scraped event", "error", err.Error(), "url", eventUrlPath)
+			return
+		}
 	})
 
 	err := v.Collector.Visit(requestURL)
