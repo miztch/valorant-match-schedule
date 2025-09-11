@@ -64,6 +64,7 @@ func containsAny(eventName string, keywords []string) bool {
 	return false
 }
 
+// EstimateRegionByEvent estimates the region of an event based on its name.
 func EstimateRegionByEvent(eventName string) string {
 	for region, keywords := range country.SubAreas {
 		if containsAny(eventName, keywords) {
@@ -78,10 +79,6 @@ func EstimateRegionByEvent(eventName string) string {
 	return ""
 }
 
-func isInternationalEvent(eventName string) bool {
-	return containsAny(eventName, country.InternationalEvents)
-}
-
 // MatchToDTO converts domain.Match to dto.Match
 func MatchToDTO(m domain.Match) dto.Match {
 	endTime := calcEndTime(m.StartTime, m.BestOf)
@@ -94,10 +91,10 @@ func MatchToDTO(m domain.Match) dto.Match {
 	}
 
 	if region == "" {
-		slog.Warn("Region is empty for match", "matchID", m.Id, "eventName", m.EventName)
+		slog.Warn("Region is empty for match", "matchID", m.Id, "eventId", m.EventId, "eventName", m.EventName)
 	}
 
-	if isInternationalEvent(m.EventName) {
+	if m.IsInternational() {
 		region += "#INTERNATIONAL"
 	}
 
