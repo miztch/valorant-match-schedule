@@ -28,7 +28,7 @@ run = [
 [tasks.deploy_dev]
 depends = ["build"]
 run = [
-    "sam deploy --config-file samconfig.toml --config-env dev"
+    "sam deploy --config-file samconfig.toml --config-env dev --no-confirm-changeset",
 ]
 
 [tasks.run_dev]
