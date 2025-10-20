@@ -55,6 +55,14 @@ func (svc *MatchService) FetchMatches(page int) ([]domain.Match, error) {
 		}
 
 		match := domain.NewMatch(m, e)
+
+		// avoid matchId duplication
+		for _, existingMatch := range matches {
+			if existingMatch.Id == match.Id {
+				slog.Warn("Duplicate match ID found, skipping", "matchId", match.Id, "matchURL", matchURL)
+				continue
+			}
+		}
 		matches = append(matches, match)
 	}
 
