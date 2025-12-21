@@ -347,6 +347,4 @@ var InternationalEvents = []int{
 	2766, // Valorant Champions 2026
 	2775, // VCT 2026: Pacific Stage 1
 	2776, // VCT 2026: Pacific Stage 2
-
-
 }
