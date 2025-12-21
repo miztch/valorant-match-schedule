@@ -336,4 +336,17 @@ var InternationalEvents = []int{
 	2500, // VCT 2025: Pacific Stage 2
 	2501, // VCT 2025: Americas Stage 2
 	2596, // Game Changers 2025: Championship Seoul
+
+	// Year 2026
+	2682, // VCT 2026: Americas Kickoff
+	2683, // VCT 2026: Pacific Kickoff
+	2684, // VCT 2026: EMEA Kickoff
+	2685, // VCT 2026: China Kickoff
+	2760, // Valorant Masters Santiago 2026
+	2765, // Valorant Masters London 2026
+	2766, // Valorant Champions 2026
+	2775, // VCT 2026: Pacific Stage 1
+	2776, // VCT 2026: Pacific Stage 2
+
+
 }
