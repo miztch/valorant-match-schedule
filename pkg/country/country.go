@@ -347,4 +347,7 @@ var InternationalEvents = []int{
 	2766, // Valorant Champions 2026
 	2775, // VCT 2026: Pacific Stage 1
 	2776, // VCT 2026: Pacific Stage 2
+	2860, // VCT 2026: Americas Stage 1
+	2863, // VCT 2026: EMEA Stage 1
+	2864, // VCT 2026: China Stage 1
 }
