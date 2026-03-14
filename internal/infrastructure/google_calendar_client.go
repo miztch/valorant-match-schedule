@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"github.com/miztch/valorant-match-schedule/internal/domain"
 	"github.com/miztch/valorant-match-schedule/internal/dto"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/calendar/v3"
@@ -25,6 +26,11 @@ func NewGoogleCalendarClient(ctx context.Context) (*GoogleCalendarClient, error)
 	keyData, err := GetServiceAccountKey()
 	if err != nil {
 		return nil, fmt.Errorf("failed to get service account key from SSM: %w", err)
+	}
+
+	// Validate the retrieved key before passing to Google API client.
+	if err := domain.ValidateServiceAccountKeyJSON(keyData); err != nil {
+		return nil, fmt.Errorf("invalid service account key: %w", err)
 	}
 
 	// Create Google API client with service account key
