@@ -28,7 +28,7 @@ func NewGoogleCalendarClient(ctx context.Context) (*GoogleCalendarClient, error)
 	}
 
 	// Create Google API client with service account key
-	creds, err := google.CredentialsFromJSON(ctx, keyData, calendar.CalendarScope)
+	creds, err := google.CredentialsFromJSONWithType(ctx, keyData, "service_account", calendar.CalendarScope)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create credentials from JSON: %w", err)
 	}
