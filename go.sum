@@ -16,8 +16,8 @@ github.com/antchfx/xmlquery v1.5.0 h1:uAi+mO40ZWfyU6mlUBxRVvL6uBNZ6LMU4M3+mQIBV4
 github.com/antchfx/xmlquery v1.5.0/go.mod h1:lJfWRXzYMK1ss32zm1GQV3gMIW/HFey3xDZmkP1SuNc=
 github.com/antchfx/xpath v1.3.5 h1:PqbXLC3TkfeZyakF5eeh3NTWEbYl4VHNVeufANzDbKQ=
 github.com/antchfx/xpath v1.3.5/go.mod h1:i54GszH55fYfBmoZXapTHN8T8tkcHfRgLyVwwqzXNcs=
-github.com/aws/aws-lambda-go v1.53.0 h1:uAMv6W/vCP/L494BAUSxe+8KVBIPK+SGPyapFt3FuMk=
-github.com/aws/aws-lambda-go v1.53.0/go.mod h1:dpMpZgvWx5vuQJfBt0zqBha60q7Dd7RfgJv23DymV8A=
+github.com/aws/aws-lambda-go v1.54.0 h1:EGYpdyRGF88xszqlGcBewz811mJeRS+maNlLZXFheII=
+github.com/aws/aws-lambda-go v1.54.0/go.mod h1:dpMpZgvWx5vuQJfBt0zqBha60q7Dd7RfgJv23DymV8A=
 github.com/aws/aws-sdk-go-v2 v1.41.4 h1:10f50G7WyU02T56ox1wWXq+zTX9I1zxG46HYuG1hH/k=
 github.com/aws/aws-sdk-go-v2 v1.41.4/go.mod h1:mwsPRE8ceUUpiTgF7QmQIJ7lgsKUPQOUl3o72QBrE1o=
 github.com/aws/aws-sdk-go-v2/config v1.32.12 h1:O3csC7HUGn2895eNrLytOJQdoL2xyJy0iYXhoZ1OmP0=
