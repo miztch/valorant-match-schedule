@@ -15,8 +15,14 @@ type Payload struct {
 	Page int `json:"page"`
 }
 
+type MatchesSummary struct {
+	Total     int `json:"total"`
+	Succeeded int `json:"succeeded"`
+	Failed    int `json:"failed"`
+}
+
 type Response struct {
-	MatchesCount int `json:"matches_count"`
+	Matches MatchesSummary `json:"matches"`
 }
 
 // Handler processes match scraping and outputs to SQS
@@ -33,7 +39,7 @@ func Handler(ctx context.Context, payload Payload) (string, error) {
 	eventRepo := infrastructure.NewEventRepository(infrastructure.NewVlrGGScraper(), infrastructure.NewEventCache())
 	app := application.NewMatchService(matchRepo, eventRepo)
 
-	matches, err := app.FetchMatches(payload.Page)
+	matches, matchURLsCount, err := app.FetchMatches(payload.Page)
 	if err != nil {
 		slog.Error("failed to fetch matches", "error", err.Error())
 		return "", err
@@ -47,7 +53,13 @@ func Handler(ctx context.Context, payload Payload) (string, error) {
 	}
 	slog.Info("Successfully sent matches to SQS", "matchCount", len(matches))
 
-	response := Response{MatchesCount: len(matches)}
+	response := Response{
+		Matches: MatchesSummary{
+			Total:     matchURLsCount,
+			Succeeded: len(matches),
+			Failed:    matchURLsCount - len(matches),
+		},
+	}
 	r, _ := json.Marshal(response)
 
 	return string(r), nil

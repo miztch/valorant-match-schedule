@@ -6,29 +6,9 @@
             "Type": "Pass",
             "Parameters": {
                 "currentPage": 1,
-                "maxPages": 10,
-                "shouldContinue": true
+                "maxPages": 10
             },
-            "Next": "Check Continue Condition"
-        },
-        "Check Continue Condition": {
-            "Type": "Choice",
-            "Choices": [
-                {
-                    "And": [
-                        {
-                            "Variable": "$.shouldContinue",
-                            "BooleanEquals": true
-                        },
-                        {
-                            "Variable": "$.currentPage",
-                            "NumericLessThanEqualsPath": "$.maxPages"
-                        }
-                    ],
-                    "Next": "Wait Before Scraping"
-                }
-            ],
-            "Default": "Execution Complete"
+            "Next": "Wait Before Scraping"
         },
         "Wait Before Scraping": {
             "Type": "Wait",
@@ -65,50 +45,52 @@
                 "lambdaResult.$": "$.lambdaResult",
                 "parsedOutput.$": "States.StringToJson($.lambdaResult)"
             },
-            "Next": "Check Matches Count"
+            "Next": "Check Continue Condition"
         },
-        "Check Matches Count": {
+        "Check Continue Condition": {
             "Type": "Choice",
             "Choices": [
                 {
-                    "Variable": "$.parsedOutput.matches_count",
-                    "NumericLessThan": 50,
-                    "Next": "Stop Processing"
+                    "And": [
+                        {
+                            "Variable": "$.parsedOutput.matches.total",
+                            "NumericGreaterThanEquals": 50
+                        },
+                        {
+                            "Variable": "$.currentPage",
+                            "NumericLessThanPath": "$.maxPages"
+                        }
+                    ],
+                    "Next": "Continue Processing"
                 }
             ],
-            "Default": "Continue Processing"
+            "Default": "Stop Processing"
         },
         "Continue Processing": {
             "Type": "Pass",
             "Parameters": {
                 "currentPage.$": "States.MathAdd($.currentPage, 1)",
                 "maxPages.$": "$.maxPages",
-                "shouldContinue": true,
                 "lastResult.$": "$.lambdaResult",
-                "lastMatchesCount.$": "$.parsedOutput.matches_count"
+                "lastMatchesCount.$": "$.parsedOutput.matches.total"
             },
-            "Next": "Check Continue Condition"
+            "Next": "Wait Before Scraping"
         },
         "Stop Processing": {
             "Type": "Pass",
             "Parameters": {
-                "currentPage.$": "$.currentPage",
-                "maxPages.$": "$.maxPages",
-                "shouldContinue": false,
-                "terminationReason": "matches_count was less than 50",
-                "finalMatchesCount.$": "$.parsedOutput.matches_count",
+                "totalPagesProcessed.$": "$.currentPage",
+                "finalMatchesCount.$": "$.parsedOutput.matches.total",
                 "lastResult.$": "$.lambdaResult"
             },
-            "Next": "Check Continue Condition"
+            "Next": "Execution Complete"
         },
         "Execution Complete": {
             "Type": "Pass",
             "Parameters": {
-                "totalPagesProcessed.$": "States.MathAdd($.currentPage, -1)",
-                "terminationReason.$": "$.terminationReason",
+                "totalPagesProcessed.$": "$.totalPagesProcessed",
                 "finalMatchesCount.$": "$.finalMatchesCount",
-                "lastResult.$": "$.lastResult",
-                "completionReason.$": "States.Format('Loop completed. shouldContinue: {}, currentPage: {}, maxPages: {}', $.shouldContinue, $.currentPage, $.maxPages)"
+                "lastResult.$": "$.lastResult"
             },
             "End": true
         }
