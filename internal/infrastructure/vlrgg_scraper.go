@@ -17,6 +17,8 @@ const (
 	crawlerUserAgent        = "Googlebot/2.1 (+http://www.google.com/bot.html)"
 	minDelayInSeconds       = 3
 	maxRandomDelayInSeconds = 7
+	maxRetries              = 3
+	defaultInitialRetryWait = 3 * time.Second
 )
 
 // VlrGGScraper is a scraper for vlr.gg
@@ -28,24 +30,56 @@ type VlrGGScraper struct {
 // NewVlrGGScraper creates a new VlrGGScraper
 func NewVlrGGScraper() *VlrGGScraper {
 	return &VlrGGScraper{
-		Collector: SetupColly(),
+		Collector: SetupColly([]string{vlrGGDomain}, defaultInitialRetryWait),
 		BaseURL:   baseURL,
 	}
 }
 
+// retryTransport is an http.RoundTripper that retries on 5xx errors with exponential backoff.
+// Retrying at the transport level ensures colly sees only the final response,
+// so Visit() returns an error only when all retries are exhausted.
+type retryTransport struct {
+	base             http.RoundTripper
+	maxRetries       int
+	initialRetryWait time.Duration
+}
+
+func (t *retryTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	var resp *http.Response
+	var err error
+	for attempt := 0; attempt <= t.maxRetries; attempt++ {
+		resp, err = t.base.RoundTrip(req)
+		if err != nil || resp.StatusCode < 500 {
+			return resp, err
+		}
+		if attempt < t.maxRetries {
+			resp.Body.Close()
+			wait := t.initialRetryWait * (1 << attempt)
+			slog.Info("Retrying request", "url", req.URL.String(), "attempt", attempt+1, "wait", wait)
+			time.Sleep(wait)
+		}
+	}
+	return resp, err
+}
+
 // SetupColly sets up a colly collector
-func SetupColly() *colly.Collector {
+func SetupColly(allowedDomains []string, initialRetryWait time.Duration) *colly.Collector {
 	c := colly.NewCollector(
-		colly.AllowedDomains(vlrGGDomain),
+		colly.AllowedDomains(allowedDomains...),
 		colly.UserAgent(crawlerUserAgent),
 	)
+
+	c.WithTransport(&retryTransport{
+		base:             http.DefaultTransport,
+		maxRetries:       maxRetries,
+		initialRetryWait: initialRetryWait,
+	})
 
 	c.Limit(&colly.LimitRule{
 		DomainGlob:  "*",
 		Delay:       minDelayInSeconds * time.Second,
 		RandomDelay: maxRandomDelayInSeconds * time.Second,
-	},
-	)
+	})
 
 	c.OnError(func(r *colly.Response, err error) {
 		slog.Error("Request failed", "url", r.Request.URL.String(), "error", err.Error(), "statusCode", r.StatusCode)
