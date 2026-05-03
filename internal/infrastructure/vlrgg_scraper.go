@@ -3,6 +3,7 @@ package infrastructure
 import (
 	"fmt"
 	"log/slog"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -220,15 +221,8 @@ func (v *VlrGGScraper) scrapeMatch(matchUrlPath string) (domain.VlrMatch, error)
 	err := v.Collector.Visit(requestURL)
 
 	if err != nil {
-		slog.Error("Failed to scrape match details", "error", err.Error(), "url", requestURL)
 		return domain.VlrMatch{}, fmt.Errorf("failed to visit %s: %w", requestURL, err)
 	}
 
-	slog.Info("Successfully scraped match",
-		"matchId", match.Id,
-		"matchName", match.Name,
-		"startTime", match.StartTime,
-		"bestOf", match.BestOf,
-	)
 	return match, nil
 }

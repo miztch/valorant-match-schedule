@@ -34,7 +34,7 @@ func (svc *MatchService) FetchMatches(page int) ([]domain.Match, int, error) {
 	for i, matchURL := range matchURLs {
 		m, err := svc.matchRepo.ScrapeMatch(matchURL)
 		if err != nil {
-			slog.Warn("Failed to scrape match, skipping", "error", err.Error(), "matchURL", matchURL, "index", i)
+			slog.Error("Failed to scrape match, skipping", "error", err.Error(), "matchURL", matchURL, "index", i)
 			continue
 		}
 
