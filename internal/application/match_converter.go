@@ -107,8 +107,10 @@ func MatchToDTO(m domain.Match) dto.Match {
 		MatchURI:    buildMatchURI(m.PagePath),
 		Region:      region,
 		StartTime:   m.StartTime,
-		TeamAway:    m.Teams[1].Name,
-		TeamHome:    m.Teams[0].Name,
-		TTL:         calcTTL(endTime, offsetTTL),
+		Teams: []dto.Team{
+			{Id: m.Teams[0].Id, Name: m.Teams[0].Name},
+			{Id: m.Teams[1].Id, Name: m.Teams[1].Name},
+		},
+		TTL: calcTTL(endTime, offsetTTL),
 	}
 }

@@ -196,11 +196,15 @@ func parseScrapedMatch(e *colly.HTMLElement, matchUrlPath string) domain.VlrMatc
 
 	// Teams
 	teams := []domain.Team{}
-	e.ForEach(".wf-title-med", func(_ int, el *colly.HTMLElement) {
+	e.ForEach("a.match-header-link", func(_ int, el *colly.HTMLElement) {
 		var t domain.Team
-		teamNamePlaceHolder := el.Text
 		r = strings.NewReplacer("\t", "", "\n", "")
-		t.Name = r.Replace(teamNamePlaceHolder)
+		t.Name = r.Replace(el.ChildText(".wf-title-med"))
+		// Extract team ID from anchor href (e.g. "/team/1234/sentinels" -> 1234)
+		teamPath := strings.Split(el.Attr("href"), "/")
+		if len(teamPath) >= 3 {
+			t.Id, _ = strconv.Atoi(teamPath[2])
+		}
 		teams = append(teams, t)
 	})
 	vlrMatch.Teams = teams
