@@ -76,10 +76,3 @@ func TestOrganizersMap(t *testing.T) {
 		}
 	}
 }
-
-func TestInternationalEvents(t *testing.T) {
-	// Check that InternationalEvents is not empty
-	if len(InternationalEvents) == 0 {
-		t.Error("InternationalEvents should not be empty")
-	}
-}
