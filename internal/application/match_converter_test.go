@@ -1,6 +1,7 @@
 package application
 
 import (
+	"reflect"
 	"testing"
 
 	"github.com/miztch/valorant-match-schedule/internal/domain"
@@ -21,7 +22,7 @@ func TestMatchToDTO(t *testing.T) {
 				StartDate:        "2025-08-18",
 				StartTime:        "2025-08-18T21:00:00+0000",
 				BestOf:           3,
-				Teams:            []domain.Team{{Name: "Twisted Minds"}, {Name: "Team RA'AD"}},
+				Teams:            []domain.Team{{Id: 1001, Name: "Twisted Minds"}, {Id: 1002, Name: "Team RA'AD"}},
 				PagePath:         "/531976/twisted-minds-vs-team-raad-challengers-2025-mena-resilience-lan-finals-lr1",
 				EventId:          2577,
 				EventName:        "Challengers 2025: MENA Resilience LAN Finals",
@@ -36,8 +37,7 @@ func TestMatchToDTO(t *testing.T) {
 				MatchURI:    "https://vlr.gg/531976/twisted-minds-vs-team-raad-challengers-2025-mena-resilience-lan-finals-lr1",
 				Region:      "EMEA",
 				StartTime:   "2025-08-18T21:00:00+0000",
-				TeamAway:    "Team RA'AD",
-				TeamHome:    "Twisted Minds",
+				Teams:       []dto.Team{{Id: 1001, Name: "Twisted Minds"}, {Id: 1002, Name: "Team RA'AD"}},
 				TTL:         1755604800,
 			},
 		},
@@ -49,7 +49,7 @@ func TestMatchToDTO(t *testing.T) {
 				StartDate:        "2024-08-25",
 				StartTime:        "2024-08-25T07:00:00+0000",
 				BestOf:           5,
-				Teams:            []domain.Team{{Name: "EDward Gaming"}, {Name: "Team Heretics"}},
+				Teams:            []domain.Team{{Id: 2001, Name: "EDward Gaming"}, {Id: 2002, Name: "Team Heretics"}},
 				PagePath:         "/378829/edward-gaming-vs-team-heretics-valorant-champions-2024-gf",
 				EventId:          2097,
 				EventName:        "Valorant Champions 2024",
@@ -64,8 +64,7 @@ func TestMatchToDTO(t *testing.T) {
 				MatchURI:    "https://vlr.gg/378829/edward-gaming-vs-team-heretics-valorant-champions-2024-gf",
 				Region:      "PACIFIC#INTERNATIONAL",
 				StartTime:   "2024-08-25T07:00:00+0000",
-				TeamAway:    "Team Heretics",
-				TeamHome:    "EDward Gaming",
+				Teams:       []dto.Team{{Id: 2001, Name: "EDward Gaming"}, {Id: 2002, Name: "Team Heretics"}},
 				TTL:         1724630400,
 			},
 		},
@@ -92,8 +91,7 @@ func TestMatchToDTO(t *testing.T) {
 				MatchURI:    "https://vlr.gg/999999/match-with-lack-of-information",
 				Region:      "",
 				StartTime:   "2024-01-01T00:00:00+0000",
-				TeamAway:    "TBD",
-				TeamHome:    "TBD",
+				Teams:       []dto.Team{{Name: "TBD"}, {Name: "TBD"}},
 				TTL:         1704121200,
 			},
 		},
@@ -101,7 +99,7 @@ func TestMatchToDTO(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := MatchToDTO(tt.match)
-			if got != tt.want {
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("MatchToDTO() = %v, want %v", got, tt.want)
 			}
 		})

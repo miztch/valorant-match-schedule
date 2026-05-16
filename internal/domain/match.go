@@ -32,6 +32,7 @@ type Match struct {
 
 // Team represents a team
 type Team struct {
+	Id   int
 	Name string
 }
 

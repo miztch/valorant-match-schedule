@@ -1,5 +1,11 @@
 package dto
 
+// Team represents a team in a match
+type Team struct {
+	Id   int    `json:"id" dynamodbav:"id"`
+	Name string `json:"name" dynamodbav:"name"`
+}
+
 // Match represents a match item in the system
 // Used for both writing to and reading from DynamoDB
 type Match struct {
@@ -11,8 +17,7 @@ type Match struct {
 	MatchURI    string `json:"match_uri" dynamodbav:"match_uri"`
 	Region      string `json:"region" dynamodbav:"region"`
 	StartTime   string `json:"start_time" dynamodbav:"start_time"`
-	TeamAway    string `json:"team_away" dynamodbav:"team_away"`
-	TeamHome    string `json:"team_home" dynamodbav:"team_home"`
+	Teams       []Team `json:"teams" dynamodbav:"teams"`
 	TTL         int64  `json:"ttl" dynamodbav:"ttl"`
 }
 
@@ -26,8 +31,7 @@ type MatchForStream struct {
 	MatchURI    *string `dynamodbav:"match_uri"`
 	Region      *string `dynamodbav:"region"`
 	StartTime   *string `dynamodbav:"start_time"`
-	TeamAway    *string `dynamodbav:"team_away"`
-	TeamHome    *string `dynamodbav:"team_home"`
+	Teams       []Team  `dynamodbav:"teams"`
 	TTL         *int64  `dynamodbav:"ttl"`
 }
 
@@ -42,8 +46,7 @@ func (m *MatchForStream) ToMatch() Match {
 		MatchURI:    getStringValue(m.MatchURI),
 		Region:      getStringValue(m.Region),
 		StartTime:   getStringValue(m.StartTime),
-		TeamAway:    getStringValue(m.TeamAway),
-		TeamHome:    getStringValue(m.TeamHome),
+		Teams:       m.Teams,
 		TTL:         getInt64Value(m.TTL),
 	}
 }
@@ -85,17 +88,17 @@ func (m *MatchForStream) GetEventDetail() (string, bool) {
 }
 
 func (m *MatchForStream) GetTeamHome() (string, bool) {
-	if m.TeamHome == nil {
+	if len(m.Teams) < 1 {
 		return "", false
 	}
-	return *m.TeamHome, true
+	return m.Teams[0].Name, true
 }
 
 func (m *MatchForStream) GetTeamAway() (string, bool) {
-	if m.TeamAway == nil {
+	if len(m.Teams) < 2 {
 		return "", false
 	}
-	return *m.TeamAway, true
+	return m.Teams[1].Name, true
 }
 
 func (m *MatchForStream) GetStartTime() (string, bool) {

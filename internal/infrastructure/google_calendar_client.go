@@ -75,11 +75,17 @@ func convertEventAttributeValueToSDKAttributeValue(eventValue events.DynamoDBAtt
 	case events.DataTypeBinary:
 		return &types.AttributeValueMemberB{Value: eventValue.Binary()}
 	case events.DataTypeList:
-		// List case requires more complex conversion, omitted for current use case
-		return &types.AttributeValueMemberS{Value: "LIST_NOT_SUPPORTED"}
+		var list []types.AttributeValue
+		for _, item := range eventValue.List() {
+			list = append(list, convertEventAttributeValueToSDKAttributeValue(item))
+		}
+		return &types.AttributeValueMemberL{Value: list}
 	case events.DataTypeMap:
-		// Map case requires more complex conversion, omitted for current use case
-		return &types.AttributeValueMemberS{Value: "MAP_NOT_SUPPORTED"}
+		m := make(map[string]types.AttributeValue)
+		for k, v := range eventValue.Map() {
+			m[k] = convertEventAttributeValueToSDKAttributeValue(v)
+		}
+		return &types.AttributeValueMemberM{Value: m}
 	case events.DataTypeNull:
 		return &types.AttributeValueMemberNULL{Value: true}
 	default:

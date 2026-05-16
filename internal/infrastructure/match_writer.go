@@ -36,7 +36,7 @@ func (w *MatchDynamoDBWriter) WriteMatches(ctx context.Context, matches []dto.Ma
 			"eventName", match.EventName,
 			"region", match.Region,
 			"startTime", match.StartTime,
-			"teams", match.TeamHome+" vs "+match.TeamAway,
+			"teams", match.Teams[0].Name+" vs "+match.Teams[1].Name,
 		)
 	}
 
