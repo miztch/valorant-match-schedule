@@ -84,14 +84,16 @@ func MatchToDTO(m domain.Match) dto.Match {
 	endTime := calcEndTime(m.StartTime, m.BestOf)
 	var region string
 	c := m.EventCountryFlag
-	if c == "" || c == "un" {
-		region = EstimateRegionByEvent(m.EventName)
-	} else {
+	if c != "" && c != "un" {
 		region = mapFlagToRegion(c)
 	}
 
 	if region == "" {
-		slog.Warn("Region is empty for match", "matchID", m.Id, "eventId", m.EventId, "eventName", m.EventName)
+		region = EstimateRegionByEvent(m.EventName)
+	}
+
+	if region == "" {
+		slog.Error("Region is empty for match", "matchID", m.Id, "eventId", m.EventId, "eventName", m.EventName, "countryFlag", c)
 	}
 
 	if m.IsInternational() {
