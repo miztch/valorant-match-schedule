@@ -262,6 +262,8 @@ var Countries = map[string]CountryInfo{
 	"za": {Name: "South Africa", Region: "EMEA"},
 	"zm": {Name: "Zambia", Region: "EMEA"},
 	"zw": {Name: "Zimbabwe", Region: "EMEA"},
+	// below are some common non-country flags that may be used for event locations
+	"eu": {Name: "European Union", Region: "EMEA"},
 }
 
 // SubAreas maps regions to lists of alternative names and sub-regions that can be used to identify the region.
