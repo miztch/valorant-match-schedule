@@ -2,8 +2,6 @@ package domain
 
 import (
 	"slices"
-
-	"github.com/miztch/valorant-match-schedule/pkg/country"
 )
 
 // VlrMatch represents a match from vlr.gg
@@ -55,5 +53,5 @@ func NewMatch(m VlrMatch, e VlrEvent) Match {
 
 // isInternational checks if the event which provided match belongs to is an international event
 func (m Match) IsInternational() bool {
-	return slices.Contains(country.InternationalEvents, m.EventId)
+	return slices.Contains(InternationalEvents, m.EventId)
 }
