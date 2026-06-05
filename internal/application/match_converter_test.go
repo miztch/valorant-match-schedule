@@ -95,6 +95,33 @@ func TestMatchToDTO(t *testing.T) {
 				TTL:         1704121200,
 			},
 		},
+		{
+			name: "South America event with unknown flag",
+			match: domain.Match{
+				Id:               684758,
+				Name:             "Qualifier: Day 1",
+				StartDate:        "2026-06-01",
+				StartTime:        "2026-06-01T18:00:00+0000",
+				BestOf:           3,
+				Teams:            []domain.Team{{Name: "TBD"}, {Name: "TBD"}},
+				PagePath:         "/684758/tbd-vs-tbd-esports-nations-cup-2026-south-america-qualifier",
+				EventId:          2998,
+				EventName:        "Esports Nations Cup 2026: South America Qualifier",
+				EventCountryFlag: "un",
+			},
+			want: dto.Match{
+				MatchID:     684758,
+				BestOf:      3,
+				EndTime:     "2026-06-01T21:00:00+0000",
+				EventDetail: "Qualifier: Day 1",
+				EventName:   "Esports Nations Cup 2026: South America Qualifier",
+				MatchURI:    "https://vlr.gg/684758/tbd-vs-tbd-esports-nations-cup-2026-south-america-qualifier",
+				Region:      "AMERICAS",
+				StartTime:   "2026-06-01T18:00:00+0000",
+				Teams:       []dto.Team{{Name: "TBD"}, {Name: "TBD"}},
+				TTL:         1780390800,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -143,6 +170,11 @@ func TestEstimateRegionByEvent(t *testing.T) {
 			name:      "Found - Organizer",
 			eventName: "Global Esports' 2025 Fight Night #3",
 			want:      "PACIFIC",
+		},
+		{
+			name:      "Found - South America",
+			eventName: "Esports Nations Cup 2026: South America Qualifier",
+			want:      "AMERICAS",
 		},
 		{
 			name:      "Not Found",
