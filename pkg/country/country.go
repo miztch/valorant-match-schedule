@@ -269,7 +269,7 @@ var Countries = map[string]CountryInfo{
 // SubAreas maps regions to lists of alternative names and sub-regions that can be used to identify the region.
 var SubAreas = map[string][]string{
 	"PACIFIC":  {"Pacific", "East Asia", "KR/JP", "SEA", "Asia Pacific", "Asia-Pacific", "Southeast Asia", "South Asia", "Oceania", "MY/SG"},
-	"AMERICAS": {"Americas", "LATAM", "Latin America", "LA-N", "LA-S"},
+	"AMERICAS": {"Americas", "LATAM", "Latin America", "LA-N", "LA-S", "South America", "North America"},
 	"EMEA": {
 		"EMEA", "Europe", "Europian", "CIS", "MENA", "Middle East", "Arab", "Arabia",
 		"Arabian", "Arabic", "Africa", "NORTH//EAST",
