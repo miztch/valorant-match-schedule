@@ -99,13 +99,14 @@ func (v *VlrGGScraper) getMatchURLList(pageNumber int) ([]string, error) {
 	requestURL := v.buildRequestURL("/matches?page=" + strconv.Itoa(pageNumber))
 	slog.Info("Scraping match URLs", "url", requestURL, "page", pageNumber)
 
+	c := v.Collector.Clone()
 	var matchURLList []string
-	v.Collector.OnHTML(".match-item", func(e *colly.HTMLElement) {
+	c.OnHTML(".match-item", func(e *colly.HTMLElement) {
 		matchUrlPath := e.Attr("href")
 		matchURLList = append(matchURLList, matchUrlPath)
 	})
 
-	err := v.Collector.Visit(requestURL)
+	err := c.Visit(requestURL)
 
 	if err != nil {
 		slog.Error("Failed to scrape match URLs", "error", err.Error(), "url", requestURL)
@@ -141,8 +142,9 @@ func parseScrapedEvent(e *colly.HTMLElement, eventUrlPath string) (domain.VlrEve
 func (v *VlrGGScraper) scrapeEvent(eventUrlPath string) (domain.VlrEvent, error) {
 	requestURL := v.buildRequestURL(eventUrlPath)
 
+	c := v.Collector.Clone()
 	var event domain.VlrEvent
-	v.Collector.OnHTML(".event-header", func(e *colly.HTMLElement) {
+	c.OnHTML(".event-header", func(e *colly.HTMLElement) {
 		var err error
 		event, err = parseScrapedEvent(e, eventUrlPath)
 		if err != nil {
@@ -151,7 +153,7 @@ func (v *VlrGGScraper) scrapeEvent(eventUrlPath string) (domain.VlrEvent, error)
 		}
 	})
 
-	err := v.Collector.Visit(requestURL)
+	err := c.Visit(requestURL)
 
 	if err != nil {
 		return domain.VlrEvent{}, fmt.Errorf("failed to visit %s: %w", requestURL, err)
@@ -217,12 +219,13 @@ func (v *VlrGGScraper) scrapeMatch(matchUrlPath string) (domain.VlrMatch, error)
 	requestURL := v.buildRequestURL(matchUrlPath)
 	slog.Info("Scraping match details", "url", requestURL, "matchPath", matchUrlPath)
 
+	c := v.Collector.Clone()
 	var match domain.VlrMatch
-	v.Collector.OnHTML(".match-header", func(e *colly.HTMLElement) {
+	c.OnHTML(".match-header", func(e *colly.HTMLElement) {
 		match = parseScrapedMatch(e, matchUrlPath)
 	})
 
-	err := v.Collector.Visit(requestURL)
+	err := c.Visit(requestURL)
 
 	if err != nil {
 		return domain.VlrMatch{}, fmt.Errorf("failed to visit %s: %w", requestURL, err)
