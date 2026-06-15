@@ -99,13 +99,14 @@ func (v *VlrGGScraper) getMatchURLList(pageNumber int) ([]string, error) {
 	requestURL := v.buildRequestURL("/matches?page=" + strconv.Itoa(pageNumber))
 	slog.Info("Scraping match URLs", "url", requestURL, "page", pageNumber)
 
+	c := v.Collector.Clone()
 	var matchURLList []string
-	v.Collector.OnHTML(".match-item", func(e *colly.HTMLElement) {
+	c.OnHTML(".match-item", func(e *colly.HTMLElement) {
 		matchUrlPath := e.Attr("href")
 		matchURLList = append(matchURLList, matchUrlPath)
 	})
 
-	err := v.Collector.Visit(requestURL)
+	err := c.Visit(requestURL)
 
 	if err != nil {
 		slog.Error("Failed to scrape match URLs", "error", err.Error(), "url", requestURL)
@@ -124,25 +125,40 @@ func parseScrapedEvent(e *colly.HTMLElement, eventUrlPath string) (domain.VlrEve
 		return domain.VlrEvent{}, err
 	}
 
-	vlrEvent := domain.VlrEvent{
-		Id:   id,
-		Name: e.ChildText(".wf-title"),
+	// vlr.gg renamed the event title class; try new name first, fall back to old.
+	name := e.ChildText("h1.event-header-main-title")
+	if name == "" {
+		name = e.ChildText(".wf-title")
 	}
 
-	countryFlagPlaceHolder := e.ChildAttr(".event-desc-item-value > .flag", "class")
-	r := strings.NewReplacer("flag mod-", "")
-	countryFlag := r.Replace(countryFlagPlaceHolder)
+	// Extract country code from the flag element's class (e.g. "flag mod-jp" → "jp").
+	// Use a broad selector so it works regardless of parent element changes.
+	countryFlag := ""
+	flagClass := e.ChildAttr("i.flag", "class")
+	if flagClass == "" {
+		flagClass = e.ChildAttr(".event-desc-item-value > .flag", "class")
+	}
+	for _, cls := range strings.Fields(flagClass) {
+		if strings.HasPrefix(cls, "mod-") {
+			countryFlag = strings.TrimPrefix(cls, "mod-")
+			break
+		}
+	}
 
-	vlrEvent.CountryFlag = countryFlag
-	return vlrEvent, nil
+	return domain.VlrEvent{
+		Id:          id,
+		Name:        name,
+		CountryFlag: countryFlag,
+	}, nil
 }
 
 // scrapeEvent scrapes an event from vlr.gg
 func (v *VlrGGScraper) scrapeEvent(eventUrlPath string) (domain.VlrEvent, error) {
 	requestURL := v.buildRequestURL(eventUrlPath)
 
+	c := v.Collector.Clone()
 	var event domain.VlrEvent
-	v.Collector.OnHTML(".event-header", func(e *colly.HTMLElement) {
+	c.OnHTML(".event-header", func(e *colly.HTMLElement) {
 		var err error
 		event, err = parseScrapedEvent(e, eventUrlPath)
 		if err != nil {
@@ -151,7 +167,7 @@ func (v *VlrGGScraper) scrapeEvent(eventUrlPath string) (domain.VlrEvent, error)
 		}
 	})
 
-	err := v.Collector.Visit(requestURL)
+	err := c.Visit(requestURL)
 
 	if err != nil {
 		return domain.VlrEvent{}, fmt.Errorf("failed to visit %s: %w", requestURL, err)
@@ -217,12 +233,13 @@ func (v *VlrGGScraper) scrapeMatch(matchUrlPath string) (domain.VlrMatch, error)
 	requestURL := v.buildRequestURL(matchUrlPath)
 	slog.Info("Scraping match details", "url", requestURL, "matchPath", matchUrlPath)
 
+	c := v.Collector.Clone()
 	var match domain.VlrMatch
-	v.Collector.OnHTML(".match-header", func(e *colly.HTMLElement) {
+	c.OnHTML(".match-header", func(e *colly.HTMLElement) {
 		match = parseScrapedMatch(e, matchUrlPath)
 	})
 
-	err := v.Collector.Visit(requestURL)
+	err := c.Visit(requestURL)
 
 	if err != nil {
 		return domain.VlrMatch{}, fmt.Errorf("failed to visit %s: %w", requestURL, err)

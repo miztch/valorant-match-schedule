@@ -34,6 +34,9 @@ func (r *eventRepositoryImpl) GetEvent(eventPagePath string) (domain.VlrEvent, e
 	if err != nil {
 		return domain.VlrEvent{}, fmt.Errorf("failed to get event: %w", err)
 	}
+	if event.Name == "" {
+		return domain.VlrEvent{}, fmt.Errorf("event scraping returned no data for %s", eventPagePath)
+	}
 	r.eventCache.cacheEvent(event)
 
 	return event, nil
