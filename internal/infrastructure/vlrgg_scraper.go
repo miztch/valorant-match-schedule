@@ -125,17 +125,31 @@ func parseScrapedEvent(e *colly.HTMLElement, eventUrlPath string) (domain.VlrEve
 		return domain.VlrEvent{}, err
 	}
 
-	vlrEvent := domain.VlrEvent{
-		Id:   id,
-		Name: e.ChildText(".wf-title"),
+	// vlr.gg renamed the event title class; try new name first, fall back to old.
+	name := e.ChildText("h1.event-header-main-title")
+	if name == "" {
+		name = e.ChildText(".wf-title")
 	}
 
-	countryFlagPlaceHolder := e.ChildAttr(".event-desc-item-value > .flag", "class")
-	r := strings.NewReplacer("flag mod-", "")
-	countryFlag := r.Replace(countryFlagPlaceHolder)
+	// Extract country code from the flag element's class (e.g. "flag mod-jp" → "jp").
+	// Use a broad selector so it works regardless of parent element changes.
+	countryFlag := ""
+	flagClass := e.ChildAttr("i.flag", "class")
+	if flagClass == "" {
+		flagClass = e.ChildAttr(".event-desc-item-value > .flag", "class")
+	}
+	for _, cls := range strings.Fields(flagClass) {
+		if strings.HasPrefix(cls, "mod-") {
+			countryFlag = strings.TrimPrefix(cls, "mod-")
+			break
+		}
+	}
 
-	vlrEvent.CountryFlag = countryFlag
-	return vlrEvent, nil
+	return domain.VlrEvent{
+		Id:          id,
+		Name:        name,
+		CountryFlag: countryFlag,
+	}, nil
 }
 
 // scrapeEvent scrapes an event from vlr.gg
