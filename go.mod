@@ -1,9 +1,9 @@
 module github.com/miztch/valorant-match-schedule
 
-go 1.25.8
+go 1.26
 
 require (
-	github.com/aws/aws-lambda-go v1.54.0
+	github.com/aws/aws-lambda-go v1.55.0
 	github.com/aws/aws-sdk-go-v2 v1.42.1
 	github.com/aws/aws-sdk-go-v2/config v1.32.30
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.20.52
