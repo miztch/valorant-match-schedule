@@ -1,7 +1,20 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended", "schedule:weekly"],
-  "enabledManagers": ["mise"],
+  "enabledManagers": ["mise", "gomod"],
   "semanticCommits": "enabled",
-  "semanticCommitType": "chore"
+  "semanticCommitType": "chore",
+  "packageRules": [
+    {
+      "description": "Root go.mod is updated by Dependabot",
+      "matchManagers": ["gomod"],
+      "enabled": false
+    },
+    {
+      "description": "Hugo Modules (theme) in website/",
+      "matchManagers": ["gomod"],
+      "matchFileNames": ["website/go.mod"],
+      "enabled": true
+    }
+  ]
 }
