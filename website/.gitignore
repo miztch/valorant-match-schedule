@@ -1,3 +1,4 @@
 public/**
 !public/.gitkeep
 resources/_gen
+.hugo_build.lock
