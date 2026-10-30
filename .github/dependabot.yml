@@ -16,15 +16,6 @@ updates:
         patterns:
           - github.com/aws/aws-sdk-go-v2
           - github.com/aws/aws-sdk-go-v2/*
-  - package-ecosystem: "gomod"
-    directory: "/website"
-    schedule:
-      interval: "weekly"
-    allow:
-      # Hugo Modules mark the theme as indirect
-      - dependency-type: "all"
-    commit-message:
-      prefix: "chore"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
