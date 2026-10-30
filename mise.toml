@@ -1,5 +1,5 @@
 [tools]
-aws-sam-cli = "1.142.1"
+aws-sam-cli = "1.171.0"
 go = "1.26.10"
 
 [tasks.fmt]
