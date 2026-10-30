@@ -34,3 +34,5 @@ go.work.sum
 .DS_Store
 .build/
 service_account_key.json
+# Hugo
+website/.hugo_build.lock
