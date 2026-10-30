@@ -1,6 +1,6 @@
 [tools]
 aws-sam-cli = "1.142.1"
-go = "1.24.1"
+go = "1.26.10"
 
 [tasks.fmt]
 run = ["go fmt ./..."]
